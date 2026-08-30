@@ -41,7 +41,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V
      local Tab9o = MakeTab({Name = "Rivals"})
 ------- BUTTON
     
-   AddButton(Tab1o, {
+   AddButton(Tab2o, {
      Name = "Gravity Hub",
     Callback = function()
 
@@ -72,7 +72,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V
         end
     end
    })
- AddButton(Tab1o, {
+ AddButton(Tab2o, {
     Name = "Longhihi BananaHub",
     Callback = function()
 
@@ -102,8 +102,8 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V
 
     end
 })
-    AddButton(Tab3o, {
-      Name = "Real Kid Hub",
+    AddButton(Tab2o, {
+      Name = "Real Kid Hub+ get key",
     Callback = function()
 
         game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -165,3 +165,216 @@ AddButton(Tab7o, {
 
     end
 })
+
+AddButton(Tab1o, {
+    Name = "🇻🇳 Laam Hub",
+    Callback = function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Chào mừng bạn đến với Laam Hub!",
+            Duration = 3
+        })
+    end
+})
+
+AddButton(Tab1o, {
+    Name = "👤 Chủ Script: Laam",
+    Callback = function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Chủ Script: Laam",
+            Duration = 3
+        })
+    end
+})
+
+AddButton(Tab1o, {
+    Name = "🎵 TikTok: Laam",
+    Callback = function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "TikTok: Laam",
+            Duration = 3
+        })
+    end
+})
+
+AddButton(Tab1o, {
+    Name = "📱 Zalo: 0942062013",
+    Callback = function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Zalo Support: 0942062013",
+            Duration = 3
+        })
+    end
+})
+
+AddButton(Tab1o, {
+    Name = "⚡ Phiên bản: Laam Hub V1",
+    Callback = function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Version: Laam Hub V1",
+            Duration = 3
+        })
+    end
+})
+
+AddButton(Tab1o, {
+    Name = "💬 Discord: Laam Hub",
+    Callback = function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Discord: Laam Hub",
+            Duration = 3
+        })
+        
+        if setclipboard then
+            setclipboard("https://discord.gg/DdvsW7zZe")
+        end
+    end
+})
+
+AddButton(Tab1o, {
+    Name = "📢 Thông báo",
+    Callback = function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Cảm ơn bạn đã sử dụng Laam Hub!",
+            Duration = 4
+        })
+    end
+})
+
+AddButton(Tab5o, {
+      Name = "Ouroboros Hub",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Ouroboros...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
+
+        end)
+
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Ouroboros thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Ouroboros thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
+AddButton(Tab9o, {
+      Name = "Aimbot Rivals",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Aimbot Rivals...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://rawscripts.net/raw/RIVALS-Aimbot-no-banned-yes-sure-102092"))()
+
+        end)
+
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Aimbot Rivals thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Aimbot Rivals thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
+AddButton(Tab5o, {
+      Name = "Script Ajjans Hub+get key",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Aimbot Rivals...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://rawscripts.net/raw/RIVALS-Aimbot-no-banned-yes-sure-102092"))()
+
+        end)
+
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Aimbot Rivals thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Aimbot Rivals thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
+AddButton(Tab2o, {
+      Name = "Hinishi Hub",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Hinishi Hub...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-Hinishi/Hinishi-Hub/refs/heads/main/Freemium.lua"))(Settings)
+        end)
+
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Hinishi Hub thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Hinishi Hub thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
