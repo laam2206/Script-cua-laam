@@ -3,7 +3,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V
        local Window = MakeWindow({
          Hub = {
          Title = "Laam Hub v1.0",
-         Animation = "Zalo supported :0942062013,Tiktok:Laam"
+         Animation = "Laam  Hub🇻🇳"
          },
         Key = {
         KeySystem = false,
@@ -167,7 +167,7 @@ AddButton(Tab7o, {
 })
 
 AddButton(Tab1o, {
-    Name = "🇻🇳 Laam Hub",
+    Name = " Laam Hub 🇻🇳",
     Callback = function()
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Laam Hub 🇻🇳",
@@ -378,3 +378,34 @@ AddButton(Tab2o, {
     end
 })
 
+AddButton(Tab5o, {
+      Name = "CRZ Hub",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở CRZ Hub...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))()
+        end)
+
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở CRZ Hub thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở CRZ Hub thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
