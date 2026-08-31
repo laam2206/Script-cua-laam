@@ -21,7 +21,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V
   })
 
        MinimizeButton({
-       Image = "http://www.roblox.com/asset/?id=104221351258741",
+       Image = "http://www.roblox.com/asset/?id=116199148610919",
        Size = {60, 60},
        Color = Color3.fromRGB(10, 10, 10),
        Corner = true,
@@ -853,7 +853,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/godhnam/Script-Free/r
 })
 
 
-AddButton(Tab8o, {
+AddButton(Tab10o, {
     Name = "Script Fly Gui V3",
     Callback = function()
 
@@ -876,6 +876,37 @@ AddButton(Tab8o, {
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
                 Text = "❌ Mở Script Fly Gui V3 thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
+AddButton(Tab6o, {
+    Name = "Script Altheris",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Altheris...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/TakZ-bit/Achyt/refs/heads/main/Bbv15.lua"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Altheris thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Altheris thất bại!",
                 Duration = 3
             })
             warn(err)
