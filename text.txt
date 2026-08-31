@@ -383,30 +383,31 @@ AddButton(Tab2o, {
     end
 })
 
-AddButton(Tab5o, {
-      Name = "CRZ Hub",
+AddButton(Tab2o, {
+      Name = "Hermanos PVP Hub",
     Callback = function()
 
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Laam Hub 🇻🇳",
-            Text = "Đang mở CRZ Hub...",
+            Text = "Đang mở Hermanos PVP Hub...",
             Duration = 3
         })
 
         local success, err = pcall(function()
-            loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))()
+            getgenv().script_mode = "PVP" -- PVP, FARM
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/hermanos-dev/hermanos-hub/refs/heads/main/Loader.lua"))()
         end)
 
         if success then
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "✅ Đã mở CRZ Hub thành công!",
+                Text = "✅ Đã mở Hermanos PVP Hub thành công!",
                 Duration = 3
             })
         else
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "❌ Mở CRZ Hub thất bại!",
+                Text = "❌ Mở Hermanos PVP Hub thất bại!",
                 Duration = 3
             })
             warn(err)
@@ -458,8 +459,12 @@ AddButton(Tab2o, {
         })
 
         local success, err = pcall(function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/mizuharasup/free/refs/heads/main/cy.lua"))()
-           
+         getgenv().Settings = {
+    ["Team"] = "Pirates", 
+    ["Max Chests"] = 30,
+    ["Fragments"] = 2500
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/godhnam/Script-Free/refs/heads/main/KaitunCyborg.Vip"))()
         end)
 
         if success then
@@ -668,9 +673,9 @@ AddButton(Tab3o, {
                 Duration = 3
             })
         else
-            game:GetService("StarterGui"):SetCore("SendNotification", {
+        game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "❌ Mở Script YQANTG thất bại!",
+                Text = "✅ Đã mở Script YQANTG thành công!",
                 Duration = 3
             })
             warn(err)
@@ -710,29 +715,135 @@ AddButton(Tab3o, {
     end
 })
 
-AddButton(Tab3o, {
-    Name = "Script Animation Hub",
+
+AddButton(Tab8o, {
+    Name = "Script Project Hub",
     Callback = function()
 
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Laam Hub 🇻🇳",
-            Text = "Đang mở Script Animation Hub...",
+            Text = "Đang mở Script Project Hub...",
             Duration = 3
         })
 
         local success, err = pcall(function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/khengieslayer-oss/Html/refs/heads/main/protected_max.lua.txt"))()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/SteWasHere/Hub/refs/heads/main/loader.lua"))()
         end)
         if success then
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "✅ Đã mở Script Animation Hub thành công!",
+                Text = "✅ Đã mở Script Project Hub thành công!",
                 Duration = 3
             })
         else
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "❌ Mở Script Animation Hub thất bại!",
+                Text = "❌ Mở Script Project Hub thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
+AddButton(Tab4o, {
+    Name = "Fox Name Hub",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Fox Name Hub...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FoxnameHub.lua"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Script Fox Name Hub thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Fox Name Hub Hub thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
+AddButton(Tab2o, {
+    Name = "Script Lấy chén thánh,Nắm Đấm Bóng Tối",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Script Lấy chén thánh,Nắm Đấm Bóng Tối...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         getgenv().Settings = {
+    ["Team"] = "Pirates", 
+    ["Max Chests"] = 30,
+    ["Fragments"] = 2500
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/godhnam/Script-Free/refs/heads/main/KaitunCyborg.Vip"))()
+        end)
+
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Script Lấy chén thánh,Nắm Đấm Bóng Tối thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Lấy chén thánh,Nắm Đấm Bóng Tối thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
+AddButton(Tab2o, {
+    Name = "Script Kaitun Tìm Trái Cây và thu hoạch trái cây",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Script Kaitun Tìm Trái Cây và thu hoạch trái cây...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         repeat task.wait() until game:IsLoaded()
+getgenv().Settings = {
+    ["Team"] = "Pirates", --"Pirates" or "Marines"
+    ["Webhook"] = "", -- URL Webhook
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/godhnam/Script-Free/refs/heads/main/FindFruit.Vip"))()
+        end)
+
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Script Kaitun Tìm Trái Cây và thu hoạch trái cây thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Kaitun Tìm Trái Cây và thu hoạch trái cây thất bại!",
                 Duration = 3
             })
             warn(err)
@@ -742,7 +853,36 @@ AddButton(Tab3o, {
 })
 
 
+AddButton(Tab8o, {
+    Name = "Script Fly Gui V3",
+    Callback = function()
 
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Fly Gui V3...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Fly Gui V3 thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Fly Gui V3 thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
 
 
 
