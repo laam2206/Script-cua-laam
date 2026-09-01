@@ -1,0 +1,9 @@
+local CorrectKey = "0942062013"
+local LinkGetKey = "https://link4m.net/MHW39EN"
+local UserInput = "Nhập key tại đây"
+if UserInput == CorrectKey then
+    print("Key hợp lệ! Đang tải script...")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt"))()
+else
+    print("Sai key! Vui lòng lấy key tại: " .. LinkGetKey)
+end
