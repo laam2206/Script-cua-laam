@@ -1,9 +1,141 @@
-local CorrectKey = "0942062013"
-local LinkGetKey = "https://link4m.net/MHW39EN"
-local UserInput = "Nhập key tại đây"
-if UserInput == CorrectKey then
-    print("Key hợp lệ! Đang tải script...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt"))()
-else
-    print("Sai key! Vui lòng lấy key tại: " .. LinkGetKey)
+-- Xóa Menu cũ nếu có để tránh trùng lặp giao diện
+if game.CoreGui:FindFirstChild("LaamHubKeySystem") then
+    game.CoreGui.LaamHubKeySystem:Destroy()
 end
+
+-- THÔNG TIN CẤU HÌNH CỦA BẠN
+local CorrectKey = "0942062013" 
+local LinkGetKey = "https://link4m.net"
+local FileName = "LaamHub_KeyConfig.txt" -- File lưu key trên máy người dùng
+
+-- Hàm kích hoạt Script chính sau khi vượt qua vòng check key
+local function ChayScriptChinh()
+    print("Laam hub 🇻🇳: Dang tai script...")
+    
+    -- Kích hoạt liên kết script chính từ GitHub của bạn
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt"))()
+end
+
+-- ====================================================================
+-- GIAO DIỆN CHÍNH "LAAM HUB 🇻🇳"
+-- ====================================================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LaamHubKeySystem"
+ScreenGui.Parent = game.CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 360, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- Tiêu đề hệ thống: Laam hub 🇻🇳
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.Text = "LAAM HUB 🇻🇳 - KEY SYSTEM"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
+Title.Font = Enum.Font.SourceSansBold
+Title.BackgroundColor3 = Color3.fromRGB(218, 37, 29) -- Màu đỏ cờ Việt Nam
+Title.Parent = MainFrame
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 10)
+TitleCorner.Parent = Title
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0, 300, 0, 40)
+TextBox.Position = UDim2.new(0.5, -150, 0.38, 0)
+TextBox.PlaceholderText = "Dán Key vào đây..."
+TextBox.Text = ""
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+TextBox.TextSize = 16
+TextBox.Font = Enum.Font.SourceSans
+TextBox.Parent = MainFrame
+local TextCorner = Instance.new("UICorner")
+TextCorner.Parent = TextBox
+
+local GetKeyBtn = Instance.new("TextButton")
+GetKeyBtn.Size = UDim2.new(0, 140, 0, 40)
+GetKeyBtn.Position = UDim2.new(0.5, -150, 0.68, 0)
+GetKeyBtn.Text = "GET KEY"
+GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
+GetKeyBtn.TextSize = 14
+GetKeyBtn.Font = Enum.Font.SourceSansBold
+GetKeyBtn.Parent = MainFrame
+local BtnCorner1 = Instance.new("UICorner")
+BtnCorner1.Parent = GetKeyBtn
+
+local CheckBtn = Instance.new("TextButton")
+CheckBtn.Size = UDim2.new(0, 140, 0, 40)
+CheckBtn.Position = UDim2.new(0.5, 10, 0.68, 0)
+CheckBtn.Text = "CHECK KEY"
+CheckBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CheckBtn.BackgroundColor3 = Color3.fromRGB(218, 165, 32) -- Màu vàng sao
+CheckBtn.TextSize = 14
+CheckBtn.Font = Enum.Font.SourceSansBold
+CheckBtn.Parent = MainFrame
+local BtnCorner2 = Instance.new("UICorner")
+BtnCorner2.Parent = CheckBtn
+
+-- XỬ LÝ SỰ KIỆN NÚT BẤM
+GetKeyBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(LinkGetKey)
+        GetKeyBtn.Text = "ĐÃ COPY LINK!"
+        task.wait(2)
+        GetKeyBtn.Text = "GET KEY"
+    else
+        TextBox.Text = LinkGetKey
+        GetKeyBtn.Text = "LINK Ở Ô NHẬP!"
+    end
+end)
+
+-- Hàm xử lý khi check key thành công
+local function XuLyThanhCong()
+    CheckBtn.Text = "KEY ĐÚNG! ĐANG LƯU..."
+    CheckBtn.BackgroundColor3 = Color3.fromRGB(76, 175, 80)
+    
+    if writefile then
+        writefile(FileName, CorrectKey)
+    end
+    
+    task.wait(1)
+    ScreenGui:Destroy() -- Tắt menu nhập key
+    ChayScriptChinh()   -- Chạy script chính
+end
+
+CheckBtn.MouseButton1Click:Connect(function()
+    if TextBox.Text == CorrectKey then
+        XuLyThanhCong()
+    else
+        CheckBtn.Text = "SAI KEY RỒI!"
+        CheckBtn.BackgroundColor3 = Color3.fromRGB(244, 67, 54)
+        task.wait(2)
+        CheckBtn.Text = "CHECK KEY"
+        CheckBtn.BackgroundColor3 = Color3.fromRGB(218, 165, 32)
+    end
+end)
+
+-- ====================================================================
+-- LOGIC KIỂM TRA TỰ ĐỘNG KHI MỞ MENU (AUTO-FILL & AUTO-CHECK)
+-- ====================================================================
+task.spawn(function()
+    task.wait(0.5) -- Chờ giao diện hiện lên mượt mà
+    if readfile and isfile and isfile(FileName) then
+        local SavedKey = readfile(FileName)
+        if SavedKey == CorrectKey then
+            TextBox.Text = CorrectKey -- Tự điền key vào ô nhập
+            task.wait(0.5) -- Giữ lại nửa giây cho người dùng thấy key đã điền
+            XuLyThanhCong() -- Tự chạy hiệu ứng thành công và vào script chính
+        end
+    end
+end)
