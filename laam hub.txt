@@ -1368,6 +1368,37 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/re
     end
 })
 
+AddButton(Tab3o, {
+    Name = "Vexon Hub",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Vexon Hub ...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+          loadstring(game:HttpGet("https://raw.githubusercontent.com/DiosDi/VexonHub/refs/heads/main/VexonHub"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Vexon Hub  thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Vexon Hub  thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+
+    end
+})
+
 
 
 
