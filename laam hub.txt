@@ -1646,35 +1646,68 @@ AddButton(Tab2o, {
 })
 
 AddButton(Tab2o, {
-    Name = "AddButton(Tab2o, {
-    Name = "Quantum hub",
+    Name = "Gantenghub",
     Callback = function()
 
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Laam Hub 🇻🇳",
-            Text = "Đang mở Quantum hub ...",
+            Text = "Đang mở Gantenghub ...",
             Duration = 3
         })
 
         local success, err = pcall(function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
+         loadstring(game:HttpGet("https://isnahamzah.site/SubscribeYTisnahamzah/gantenghub30"))()
         end)
         if success then
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "✅ Đã mở  Quantum hub thành công!",
+                Text = "✅ Đã mở  Gantenghub thành công!",
                 Duration = 3
             })
         else
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "❌ Mở Script Quantum hub  thất bại!",
+                Text = "❌ Mở Script Gantenghub thất bại!",
                 Duration = 3
             })
             warn(err)
         end
     end
 })
+
+AddButton(Tab2o, {
+    Name = "Void Hub",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Void Hub ...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://voidon.top/api/loader/main"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở  Void Hub thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Void Hub thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+    end
+})
+
+
+
+
 
 
 
