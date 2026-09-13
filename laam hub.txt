@@ -1,33 +1,36 @@
-loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua")))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V2/refs/heads/main/UiREDzV2.lua"))()
 
-       local Window = MakeWindow({
-         Hub = {
-         Title = "Laam Hub v1.0",
-         Animation = "Laam  Hub🇻🇳"
-         },
-        Key = {
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+local Window = MakeWindow({
+    Hub = {
+        Title = "Laam Hub 🇻🇳 | " .. Player.Name .. " | Script Tổng hợp",
+        Animation = "Laam Hub🇻🇳"
+    },
+    Key = {
         KeySystem = false,
         Title = "Key System",
         Description = "",
         KeyLink = "",
         Keys = {"1234"},
         Notifi = {
-        Notifications = true,
-        CorrectKey = "Running the Script...",
-       Incorrectkey = "The key is incorrect",
-       CopyKeyLink = "Copied to Clipboard"
-      }
+            Notifications = true,
+            CorrectKey = "Running the Script...",
+            Incorrectkey = "The key is incorrect",
+            CopyKeyLink = "Copied to Clipboard"
+        }
     }
-  })
+})
 
-       MinimizeButton({
-       Image = "http://www.roblox.com/asset/?id=116199148610919",
-       Size = {60, 60},
-       Color = Color3.fromRGB(10, 10, 10),
-       Corner = true,
-       Stroke = false,
-       StrokeColor = Color3.fromRGB(255, 0, 0)
-      })
+MinimizeButton({
+    Image = "http://www.roblox.com/asset/?id=116199148610919",
+    Size = {60, 60},
+    Color = Color3.fromRGB(10, 10, 10),
+    Corner = true,
+    Stroke = false,
+    StrokeColor = Color3.fromRGB(255, 0, 0)
+})
       
 ------ Tab
      local Tab1o = MakeTab({Name = "Giới Thiệu"})
@@ -44,6 +47,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/daucobonhi/Ui-Redz-V
      local Tab12o = MakeTab({Name = "Volleybal Legends"})
      local Tab13o = MakeTab({Name = "Anime Expeditions"})
      local Tab14o = MakeTab({Name = "Fix Lag"})
+     local Tab15o = MakeTab({Name = "Flight world"})
      local Tab16o = MakeTab({Name = "Kick a Lucky Block "})
      local Tab17o = MakeTab({Name = "Evomon"})
      local Tab18o = MakeTab({Name = "Racket Rivals"})
@@ -1588,7 +1592,7 @@ AddButton(Tab15o, {
 })
 
 AddButton(Tab5o, {
-    Name = "Script tự động nhặt trứng",
+    Name = "Script tự động nhặt trứng theo yêu cầu 1",
     Callback = function()
 
         game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -1857,35 +1861,6 @@ AddButton(Tab17o, {
     end
 })
 
-AddButton(Tab17o, {
-    Name = "Kaioshin3 Hub",
-    Callback = function()
-
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Laam Hub 🇻🇳",
-            Text = "Đang mở Kaioshin3 Hub ...",
-            Duration = 3
-        })
-
-        local success, err = pcall(function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/Kaioshin3/evomon/refs/heads/main/vip"))()
-        end)
-        if success then
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "Laam Hub 🇻🇳",
-                Text = "✅ Đã mở  Kaioshin3 Hub thành công!",
-                Duration = 3
-            })
-        else
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "Laam Hub 🇻🇳",
-                Text = "❌ Mở Script Kaioshin3 Hub thất bại!",
-                Duration = 3
-            })
-            warn(err)
-        end
-    end
-})
 AddButton(Tab18o, {
     Name = "Karbid Hub",
     Callback = function()
@@ -2068,36 +2043,6 @@ AddButton(Tab17o, {
     end
 })
 
-AddButton(Tab17o, {
-    Name = "Howl Hub",
-    Callback = function()
-
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Laam Hub 🇻🇳",
-            Text = "Đang mở Howl Hub ...",
-            Duration = 3
-        })
-
-        local success, err = pcall(function()
-         loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/5b00b79ec8d66185bcb443708106daefcdee26d015afbd1d435eb89545b6bea2/download"))()
-        end)
-        if success then
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "Laam Hub 🇻🇳",
-                Text = "✅ Đã mở  Howl Hub thành công!",
-                Duration = 3
-            })
-        else
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "Laam Hub 🇻🇳",
-                Text = "❌ Mở Script Howl Hub thất bại!",
-                Duration = 3
-            })
-            warn(err)
-        end
-    end
-})
-
 AddButton(Tab5o, {
     Name = "Senar Hub",
     Callback = function()
@@ -2188,7 +2133,65 @@ AddButton(Tab6o, {
     end
 })
 
+AddButton(Tab5o, {
+    Name = "Bk's Hub",
+    Callback = function()
 
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Bk's Hub ...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/9ee4edde227ac85f50872bf9e4226508.lua"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở  Bk's Hub thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Bk's Hub thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+    end
+})
+
+AddButton(Tab5o, {
+    Name = "Script tự đọng nhặt trứng theo yêu cầu 2",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Script tự đọng nhặt trứng theo yêu cầu 2 ...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/davizin713/ONhub/refs/heads/main/script.lua", true))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở  Script tự đọng nhặt trứng theo yêu cầu 2 thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Script tự đọng nhặt trứng theo yêu cầu 2 thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+    end
+}) 
 
 
 
