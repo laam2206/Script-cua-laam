@@ -2376,6 +2376,95 @@ AddButton(Tab2o, {
     end
 }) 
 
+AddButton(Tab4o, {
+    Name = "Ringta script",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Script Ringta script...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+          loadstring(game:HttpGet("https://raw.githubusercontent.com/wehibuyfgyuwe/99nights.github.io/refs/heads/main/ringta.lua"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Script Ringta script thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Ringta script thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+    end
+}) 
+
+AddButton(Tab4o, {
+    Name = "H4XScript",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Script H4XScript...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+             loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/loader.lua", true))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Script H4XScript thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script H4XScript thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+    end
+}) 
+AddButton(Tab19o, {
+    Name = "Meng hub",
+    Callback = function()
+
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Laam Hub 🇻🇳",
+            Text = "Đang mở Script Meng hub...",
+            Duration = 3
+        })
+
+        local success, err = pcall(function()
+             loadstring(game:HttpGet("https://raw.githubusercontent.com/GrexXMeng/Mengs/refs/heads/main/library"))()
+        end)
+        if success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "✅ Đã mở Script Meng hub thành công!",
+                Duration = 3
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Laam Hub 🇻🇳",
+                Text = "❌ Mở Script Meng hub thất bại!",
+                Duration = 3
+            })
+            warn(err)
+        end
+    end
+}) 
+
 
 
 
