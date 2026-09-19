@@ -2165,12 +2165,12 @@ AddButton(Tab5o, {
 })
 
 AddButton(Tab5o, {
-    Name = "Script tự đọng nhặt trứng theo yêu cầu 3",
+    Name = "Script tự đọng nhặt trứng theo yêu cầu 2",
     Callback = function()
 
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Laam Hub 🇻🇳",
-            Text = "Đang mở Script tự đọng nhặt trứng theo yêu cầu 3...",
+            Text = "Đang mở Script tự đọng nhặt trứng theo yêu cầu 2...",
             Duration = 3
         })
 
@@ -2180,13 +2180,13 @@ AddButton(Tab5o, {
         if success then
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "✅ Đã mở  Script tự đọng nhặt trứng theo yêu cầu 3 thành công!",
+                Text = "✅ Đã mở  Script tự đọng nhặt trứng theo yêu cầu 2 thành công!",
                 Duration = 3
             })
         else
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Laam Hub 🇻🇳",
-                Text = "❌ Mở Script Script tự đọng nhặt trứng theo yêu cầu 3 thất bại!",
+                Text = "❌ Mở Script Script tự đọng nhặt trứng theo yêu cầu 2 thất bại!",
                 Duration = 3
             })
             warn(err)
@@ -2372,7 +2372,7 @@ AddButton(Tab2, {
             warn(err)
         end
     end
-}) 
+})
 
 AddButton(Tab4, {
     Name = "Ringta script",
@@ -2609,7 +2609,7 @@ AddButton(Tab6, {
     end
 }) 
 
-AddButton(Tab6, {
+AddButton(Tab6,{
     Name = "Winds Hub",
     Callback = function()
 
