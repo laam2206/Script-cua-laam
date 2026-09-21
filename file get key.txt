@@ -1,141 +1,536 @@
--- Xóa Menu cũ nếu có để tránh trùng lặp giao diện
-if game.CoreGui:FindFirstChild("LaamHubKeySystem") then
-    game.CoreGui.LaamHubKeySystem:Destroy()
+-- ============================================
+-- LAAM HUB 🇻🇳 - GET KEY MENU (V2 - Lưu key 2 lớp)
+-- Dán vào ĐẦU file script Laam Hub chính
+-- ============================================
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+
+-- ============================================
+-- CẤU HÌNH
+-- ============================================
+local CONFIG = {
+    API_URL = "https://script-cua-laam.onrender.com/api/verify",
+    LINK4M_URL = "https://link4m.net/juG2sRa",
+    SavedKeyFile = "LaamHub_SavedKey.txt",
+}
+
+-- ============================================
+-- LẤY HWID
+-- ============================================
+local function GetHWID()
+    if gethwid then
+        local ok, hwid = pcall(gethwid)
+        if ok and hwid then return hwid end
+    end
+    if syn and syn.get_hwid then
+        local ok, hwid = pcall(syn.get_hwid)
+        if ok and hwid then return hwid end
+    end
+    if krnl_gethwid then
+        local ok, hwid = pcall(krnl_gethwid)
+        if ok and hwid then return hwid end
+    end
+    local ok, hwid = pcall(function()
+        return game:GetService("RbxAnalyticsService"):GetClientId()
+    end)
+    if ok and hwid then return hwid end
+    return "UNKNOWN_" .. tostring(LocalPlayer.UserId)
 end
 
--- THÔNG TIN CẤU HÌNH CỦA BẠN
-local CorrectKey = "0942062013" 
-local LinkGetKey = "https://link4m.net"
-local FileName = "LaamHub_KeyConfig.txt" -- File lưu key trên máy người dùng
-
--- Hàm kích hoạt Script chính sau khi vượt qua vòng check key
-local function ChayScriptChinh()
-    print("Laam hub 🇻🇳: Dang tai script...")
+-- ============================================
+-- LƯU KEY 2 LỚP (file + getgenv)
+-- ============================================
+local function SaveKey(key)
+    -- Lớp 1: getgenv (luôn hoạt động)
+    getgenv().LaamHub_Key = key
     
-    -- Kích hoạt liên kết script chính từ GitHub của bạn
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt"))()
+    -- Lớp 2: file (nếu executor hỗ trợ)
+    if writefile then
+        pcall(writefile, CONFIG.SavedKeyFile, key)
+    end
 end
 
--- ====================================================================
--- GIAO DIỆN CHÍNH "LAAM HUB 🇻🇳"
--- ====================================================================
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "LaamHubKeySystem"
-ScreenGui.Parent = game.CoreGui
+local function ReadSavedKey()
+    -- Lớp 1: getgenv
+    if getgenv().LaamHub_Key and getgenv().LaamHub_Key ~= "" then
+        return getgenv().LaamHub_Key
+    end
+    
+    -- Lớp 2: file
+    if isfile and readfile then
+        local ok, exists = pcall(isfile, CONFIG.SavedKeyFile)
+        if ok and exists then
+            local ok2, content = pcall(readfile, CONFIG.SavedKeyFile)
+            if ok2 and content and content ~= "" then
+                return content
+            end
+        end
+    end
+    
+    return nil
+end
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 360, 0, 220)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -110)
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.Parent = ScreenGui
+local function DeleteSavedKey()
+    getgenv().LaamHub_Key = nil
+    if delfile then
+        pcall(delfile, CONFIG.SavedKeyFile)
+    end
+end
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 10)
-UICorner.Parent = MainFrame
+-- ============================================
+-- XÁC THỰC KEY QUA API (đa executor)
+-- ============================================
+local function VerifyKeyOnline(inputKey)
+    local hwid = GetHWID()
+    local payload = HttpService:JSONEncode({
+        key = inputKey,
+        hwid = hwid,
+        username = LocalPlayer.Name,
+    })
+    
+    local responseBody = nil
+    
+    -- Thử request()
+    if request then
+        local ok, response = pcall(function()
+            return request({
+                Url = CONFIG.API_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = payload,
+            })
+        end)
+        if ok and response then
+            responseBody = response.Body or response
+        end
+    end
+    
+    -- Thử syn.request
+    if not responseBody and syn and syn.request then
+        local ok, response = pcall(function()
+            return syn.request({
+                Url = CONFIG.API_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = payload,
+            })
+        end)
+        if ok and response then
+            responseBody = response.Body or response
+        end
+    end
+    
+    -- Thử http_request
+    if not responseBody and http_request then
+        local ok, response = pcall(function()
+            return http_request({
+                Url = CONFIG.API_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = payload,
+            })
+        end)
+        if ok and response then
+            responseBody = response.Body or response
+        end
+    end
+    
+    -- Fallback HttpService
+    if not responseBody then
+        local ok, response = pcall(function()
+            return HttpService:PostAsync(CONFIG.API_URL, payload, Enum.HttpContentType.ApplicationJson)
+        end)
+        if ok then responseBody = response end
+    end
+    
+    if not responseBody then
+        return false, "Không kết nối được server!"
+    end
+    
+    local ok, data = pcall(HttpService.JSONDecode, HttpService, responseBody)
+    if not ok then
+        return false, "Server trả về lỗi!"
+    end
+    
+    return data.valid, data.message
+end
 
--- Tiêu đề hệ thống: Laam hub 🇻🇳
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 45)
-Title.Text = "LAAM HUB 🇻🇳 - KEY SYSTEM"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 18
-Title.Font = Enum.Font.SourceSansBold
-Title.BackgroundColor3 = Color3.fromRGB(218, 37, 29) -- Màu đỏ cờ Việt Nam
-Title.Parent = MainFrame
-local TitleCorner = Instance.new("UICorner")
-TitleCorner.CornerRadius = UDim.new(0, 10)
-TitleCorner.Parent = Title
+-- ============================================
+-- GIAO DIỆN GET KEY
+-- ============================================
+local KeyGui = Instance.new("ScreenGui")
+KeyGui.Name = "LaamHubKeySystem"
+KeyGui.ResetOnSpawn = false
+KeyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+KeyGui.Parent = game.CoreGui
 
-local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0, 300, 0, 40)
-TextBox.Position = UDim2.new(0.5, -150, 0.38, 0)
-TextBox.PlaceholderText = "Dán Key vào đây..."
-TextBox.Text = ""
-TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextBox.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-TextBox.TextSize = 16
-TextBox.Font = Enum.Font.SourceSans
-TextBox.Parent = MainFrame
-local TextCorner = Instance.new("UICorner")
-TextCorner.Parent = TextBox
+-- Backdrop
+local Backdrop = Instance.new("Frame")
+Backdrop.Size = UDim2.new(1, 0, 1, 0)
+Backdrop.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Backdrop.BackgroundTransparency = 0.5
+Backdrop.BorderSizePixel = 0
+Backdrop.ZIndex = 1
+Backdrop.Parent = KeyGui
 
+-- Khung chính
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Size = UDim2.new(0, 460, 0, 430)
+KeyFrame.Position = UDim2.new(0.5, -230, 0.5, -215)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+KeyFrame.BorderSizePixel = 0
+KeyFrame.Active = true
+KeyFrame.Draggable = true
+KeyFrame.ZIndex = 2
+KeyFrame.Parent = KeyGui
+
+local KeyCorner = Instance.new("UICorner")
+KeyCorner.CornerRadius = UDim.new(0, 16)
+KeyCorner.Parent = KeyFrame
+
+local Gradient = Instance.new("UIGradient")
+Gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 30)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 15, 20)),
+})
+Gradient.Rotation = 45
+Gradient.Parent = KeyFrame
+
+local KeyStroke = Instance.new("UIStroke")
+KeyStroke.Color = Color3.fromRGB(218, 37, 29)
+KeyStroke.Thickness = 2
+KeyStroke.Transparency = 0.2
+KeyStroke.Parent = KeyFrame
+
+task.spawn(function()
+    while KeyFrame.Parent do
+        TweenService:Create(KeyStroke, TweenInfo.new(1.5), {Transparency = 0.7}):Play()
+        task.wait(1.5)
+        TweenService:Create(KeyStroke, TweenInfo.new(1.5), {Transparency = 0.2}):Play()
+        task.wait(1.5)
+    end
+end)
+
+-- Logo cờ VN
+local LogoFrame = Instance.new("Frame")
+LogoFrame.Size = UDim2.new(0, 80, 0, 80)
+LogoFrame.Position = UDim2.new(0.5, -40, 0, 20)
+LogoFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+LogoFrame.BorderSizePixel = 0
+LogoFrame.ZIndex = 3
+LogoFrame.Parent = KeyFrame
+
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(1, 0)
+LogoCorner.Parent = LogoFrame
+
+local LogoStroke = Instance.new("UIStroke")
+LogoStroke.Color = Color3.fromRGB(218, 37, 29)
+LogoStroke.Thickness = 2
+LogoStroke.Parent = LogoFrame
+
+local LogoText = Instance.new("TextLabel")
+LogoText.Size = UDim2.new(1, 0, 1, 0)
+LogoText.BackgroundTransparency = 1
+LogoText.Text = "🇻🇳"
+LogoText.TextSize = 50
+LogoText.Font = Enum.Font.GothamBold
+LogoText.ZIndex = 4
+LogoText.Parent = LogoFrame
+
+-- Tiêu đề
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Size = UDim2.new(1, 0, 0, 30)
+KeyTitle.Position = UDim2.new(0, 0, 0, 110)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Text = "LAAM HUB"
+KeyTitle.TextColor3 = Color3.fromRGB(255, 205, 0)
+KeyTitle.TextSize = 24
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.ZIndex = 3
+KeyTitle.Parent = KeyFrame
+
+-- Phụ đề
+local KeySubTitle = Instance.new("TextLabel")
+KeySubTitle.Size = UDim2.new(1, 0, 0, 20)
+KeySubTitle.Position = UDim2.new(0, 0, 0, 140)
+KeySubTitle.BackgroundTransparency = 1
+KeySubTitle.Text = "Nhập key để sử dụng script"
+KeySubTitle.TextColor3 = Color3.fromRGB(140, 140, 150)
+KeySubTitle.TextSize = 12
+KeySubTitle.Font = Enum.Font.Gotham
+KeySubTitle.ZIndex = 3
+KeySubTitle.Parent = KeyFrame
+
+-- Ô nhập key
+local KeyInput = Instance.new("TextBox")
+KeyInput.Size = UDim2.new(1, -50, 0, 48)
+KeyInput.Position = UDim2.new(0, 25, 0, 175)
+KeyInput.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+KeyInput.BorderSizePixel = 0
+KeyInput.Text = ""
+KeyInput.PlaceholderText = "Nhập key tại đây..."
+KeyInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 110)
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.TextSize = 13
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.ClearTextOnFocus = false
+KeyInput.ZIndex = 3
+KeyInput.Parent = KeyFrame
+
+local KeyInputCorner = Instance.new("UICorner")
+KeyInputCorner.CornerRadius = UDim.new(0, 10)
+KeyInputCorner.Parent = KeyInput
+
+local KeyInputStroke = Instance.new("UIStroke")
+KeyInputStroke.Color = Color3.fromRGB(60, 60, 70)
+KeyInputStroke.Thickness = 1
+KeyInputStroke.Parent = KeyInput
+
+KeyInput.Focused:Connect(function()
+    TweenService:Create(KeyInputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(218, 37, 29)}):Play()
+end)
+KeyInput.FocusLost:Connect(function()
+    TweenService:Create(KeyInputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(60, 60, 70)}):Play()
+end)
+
+-- Nút XÁC NHẬN
+local KeyBtn = Instance.new("TextButton")
+KeyBtn.Size = UDim2.new(1, -50, 0, 46)
+KeyBtn.Position = UDim2.new(0, 25, 0, 235)
+KeyBtn.BackgroundColor3 = Color3.fromRGB(218, 37, 29)
+KeyBtn.Text = "XÁC NHẬN KEY"
+KeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBtn.TextSize = 14
+KeyBtn.Font = Enum.Font.GothamBold
+KeyBtn.BorderSizePixel = 0
+KeyBtn.AutoButtonColor = false
+KeyBtn.ZIndex = 3
+KeyBtn.Parent = KeyFrame
+
+local KeyBtnCorner = Instance.new("UICorner")
+KeyBtnCorner.CornerRadius = UDim.new(0, 10)
+KeyBtnCorner.Parent = KeyBtn
+
+local KeyBtnGradient = Instance.new("UIGradient")
+KeyBtnGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(218, 37, 29)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 80)),
+})
+KeyBtnGradient.Rotation = 45
+KeyBtnGradient.Parent = KeyBtn
+
+-- Nút LẤY KEY
 local GetKeyBtn = Instance.new("TextButton")
-GetKeyBtn.Size = UDim2.new(0, 140, 0, 40)
-GetKeyBtn.Position = UDim2.new(0.5, -150, 0.68, 0)
-GetKeyBtn.Text = "GET KEY"
-GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-GetKeyBtn.BackgroundColor3 = Color3.fromRGB(34, 139, 34)
+GetKeyBtn.Size = UDim2.new(1, -50, 0, 46)
+GetKeyBtn.Position = UDim2.new(0, 25, 0, 290)
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(255, 205, 0)
+GetKeyBtn.Text = "LẤY KEY MIỄN PHÍ"
+GetKeyBtn.TextColor3 = Color3.fromRGB(30, 30, 30)
 GetKeyBtn.TextSize = 14
-GetKeyBtn.Font = Enum.Font.SourceSansBold
-GetKeyBtn.Parent = MainFrame
-local BtnCorner1 = Instance.new("UICorner")
-BtnCorner1.Parent = GetKeyBtn
+GetKeyBtn.Font = Enum.Font.GothamBold
+GetKeyBtn.BorderSizePixel = 0
+GetKeyBtn.AutoButtonColor = false
+GetKeyBtn.ZIndex = 3
+GetKeyBtn.Parent = KeyFrame
 
-local CheckBtn = Instance.new("TextButton")
-CheckBtn.Size = UDim2.new(0, 140, 0, 40)
-CheckBtn.Position = UDim2.new(0.5, 10, 0.68, 0)
-CheckBtn.Text = "CHECK KEY"
-CheckBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CheckBtn.BackgroundColor3 = Color3.fromRGB(218, 165, 32) -- Màu vàng sao
-CheckBtn.TextSize = 14
-CheckBtn.Font = Enum.Font.SourceSansBold
-CheckBtn.Parent = MainFrame
-local BtnCorner2 = Instance.new("UICorner")
-BtnCorner2.Parent = CheckBtn
+local GetKeyBtnCorner = Instance.new("UICorner")
+GetKeyBtnCorner.CornerRadius = UDim.new(0, 10)
+GetKeyBtnCorner.Parent = GetKeyBtn
 
--- XỬ LÝ SỰ KIỆN NÚT BẤM
+local GetKeyBtnGradient = Instance.new("UIGradient")
+GetKeyBtnGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 205, 0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 150, 0)),
+})
+GetKeyBtnGradient.Rotation = 45
+GetKeyBtnGradient.Parent = GetKeyBtn
+
+-- Trạng thái
+local StatusFrame = Instance.new("Frame")
+StatusFrame.Size = UDim2.new(1, -50, 0, 45)
+StatusFrame.Position = UDim2.new(0, 25, 0, 345)
+StatusFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+StatusFrame.BorderSizePixel = 0
+StatusFrame.ZIndex = 3
+StatusFrame.Parent = KeyFrame
+
+local StatusCorner = Instance.new("UICorner")
+StatusCorner.CornerRadius = UDim.new(0, 8)
+StatusCorner.Parent = StatusFrame
+
+local KeyStatus = Instance.new("TextLabel")
+KeyStatus.Size = UDim2.new(1, -10, 1, 0)
+KeyStatus.Position = UDim2.new(0, 5, 0, 0)
+KeyStatus.BackgroundTransparency = 1
+KeyStatus.Text = "Vui lòng nhập key hoặc lấy key mới"
+KeyStatus.TextColor3 = Color3.fromRGB(180, 180, 190)
+KeyStatus.TextSize = 11
+KeyStatus.Font = Enum.Font.Gotham
+KeyStatus.TextWrapped = true
+KeyStatus.ZIndex = 4
+KeyStatus.Parent = StatusFrame
+
+-- Nút Copy HWID
+local HWIDBtn = Instance.new("TextButton")
+HWIDBtn.Size = UDim2.new(0, 120, 0, 26)
+HWIDBtn.Position = UDim2.new(0.5, -60, 1, -32)
+HWIDBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+HWIDBtn.Text = "Copy HWID"
+HWIDBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
+HWIDBtn.TextSize = 11
+HWIDBtn.Font = Enum.Font.Gotham
+HWIDBtn.BorderSizePixel = 0
+HWIDBtn.AutoButtonColor = false
+HWIDBtn.ZIndex = 3
+HWIDBtn.Parent = KeyFrame
+
+local HWIDBtnCorner = Instance.new("UICorner")
+HWIDBtnCorner.CornerRadius = UDim.new(0, 6)
+HWIDBtnCorner.Parent = HWIDBtn
+
+-- ============================================
+-- SỰ KIỆN
+-- ============================================
+
+KeyBtn.MouseEnter:Connect(function()
+    TweenService:Create(KeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 60, 50)}):Play()
+end)
+KeyBtn.MouseLeave:Connect(function()
+    TweenService:Create(KeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(218, 37, 29)}):Play()
+end)
+
+GetKeyBtn.MouseEnter:Connect(function()
+    TweenService:Create(GetKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 230, 80)}):Play()
+end)
+GetKeyBtn.MouseLeave:Connect(function()
+    TweenService:Create(GetKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 205, 0)}):Play()
+end)
+
+-- Click LẤY KEY
 GetKeyBtn.MouseButton1Click:Connect(function()
     if setclipboard then
-        setclipboard(LinkGetKey)
-        GetKeyBtn.Text = "ĐÃ COPY LINK!"
-        task.wait(2)
-        GetKeyBtn.Text = "GET KEY"
-    else
-        TextBox.Text = LinkGetKey
-        GetKeyBtn.Text = "LINK Ở Ô NHẬP!"
+        setclipboard(CONFIG.LINK4M_URL)
     end
+    KeyStatus.Text = "Đã copy link! Mở trình duyệt dán link để lấy key."
+    KeyStatus.TextColor3 = Color3.fromRGB(120, 180, 255)
+    
+    pcall(function()
+        game:GetService("GuiService"):OpenBrowserWindow(CONFIG.LINK4M_URL)
+    end)
 end)
 
--- Hàm xử lý khi check key thành công
-local function XuLyThanhCong()
-    CheckBtn.Text = "KEY ĐÚNG! ĐANG LƯU..."
-    CheckBtn.BackgroundColor3 = Color3.fromRGB(76, 175, 80)
-    
-    if writefile then
-        writefile(FileName, CorrectKey)
+-- Click XÁC NHẬN
+KeyBtn.MouseButton1Click:Connect(function()
+    local input = KeyInput.Text
+    if input == "" then
+        KeyStatus.Text = "Vui lòng nhập key!"
+        KeyStatus.TextColor3 = Color3.fromRGB(255, 200, 100)
+        return
     end
     
-    task.wait(1)
-    ScreenGui:Destroy() -- Tắt menu nhập key
-    ChayScriptChinh()   -- Chạy script chính
-end
-
-CheckBtn.MouseButton1Click:Connect(function()
-    if TextBox.Text == CorrectKey then
-        XuLyThanhCong()
+    KeyStatus.Text = "Đang xác thực..."
+    KeyStatus.TextColor3 = Color3.fromRGB(255, 255, 150)
+    
+    local valid, message = VerifyKeyOnline(input)
+    
+    if valid then
+        KeyStatus.Text = message
+        KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
+        SaveKey(input)
+        
+        task.wait(1.5)
+        
+        local closeTween = TweenService:Create(KeyFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = UDim2.new(0.5, 0, 0.5, 0)
+        })
+        closeTween:Play()
+        
+        TweenService:Create(Backdrop, TweenInfo.new(0.3), {
+            BackgroundTransparency = 1
+        }):Play()
+        
+        closeTween.Completed:Connect(function()
+            KeyGui:Destroy()
+            if _G.OpenLaamHub then
+                _G.OpenLaamHub()
+            end
+        end)
     else
-        CheckBtn.Text = "SAI KEY RỒI!"
-        CheckBtn.BackgroundColor3 = Color3.fromRGB(244, 67, 54)
-        task.wait(2)
-        CheckBtn.Text = "CHECK KEY"
-        CheckBtn.BackgroundColor3 = Color3.fromRGB(218, 165, 32)
-    end
-end)
-
--- ====================================================================
--- LOGIC KIỂM TRA TỰ ĐỘNG KHI MỞ MENU (AUTO-FILL & AUTO-CHECK)
--- ====================================================================
-task.spawn(function()
-    task.wait(0.5) -- Chờ giao diện hiện lên mượt mà
-    if readfile and isfile and isfile(FileName) then
-        local SavedKey = readfile(FileName)
-        if SavedKey == CorrectKey then
-            TextBox.Text = CorrectKey -- Tự điền key vào ô nhập
-            task.wait(0.5) -- Giữ lại nửa giây cho người dùng thấy key đã điền
-            XuLyThanhCong() -- Tự chạy hiệu ứng thành công và vào script chính
+        KeyStatus.Text = message
+        KeyStatus.TextColor3 = Color3.fromRGB(255, 120, 120)
+        
+        local originalPos = KeyFrame.Position
+        for i = 1, 3 do
+            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
+                Position = originalPos + UDim2.new(0, 10, 0, 0)
+            }):Play()
+            task.wait(0.05)
+            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
+                Position = originalPos - UDim2.new(0, 10, 0, 0)
+            }):Play()
+            task.wait(0.05)
         end
+        TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
+            Position = originalPos
+        }):Play()
+    end
+end)
+
+-- Click COPY HWID
+HWIDBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(GetHWID())
+        KeyStatus.Text = "Đã copy HWID!"
+        KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
+    end
+end)
+
+-- ============================================
+-- TỰ ĐỘNG ĐỌC KEY ĐÃ LƯU
+-- ============================================
+task.spawn(function()
+    local saved = ReadSavedKey()
+    if saved and saved ~= "" then
+        KeyStatus.Text = "Đang kiểm tra key đã lưu..."
+        KeyStatus.TextColor3 = Color3.fromRGB(180, 180, 190)
+        
+        -- Hiện key cũ trong ô nhập
+        KeyInput.Text = saved
+        
+        local valid, message = VerifyKeyOnline(saved)
+        if valid then
+            KeyStatus.Text = "Key hợp lệ! Đang vào menu..."
+            KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
+            task.wait(1)
+            
+            local closeTween = TweenService:Create(KeyFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+                Size = UDim2.new(0, 0, 0, 0),
+                Position = UDim2.new(0.5, 0, 0.5, 0)
+            })
+            closeTween:Play()
+            
+            TweenService:Create(Backdrop, TweenInfo.new(0.3), {
+                BackgroundTransparency = 1
+            }):Play()
+            
+            closeTween.Completed:Connect(function()
+                KeyGui:Destroy()
+                if _G.OpenLaamHub then
+                    _G.OpenLaamHub()
+                end
+            end)
+        else
+            DeleteSavedKey()
+            KeyStatus.Text = message .. " Vui lòng lấy key mới!"
+            KeyStatus.TextColor3 = Color3.fromRGB(255, 200, 100)
+        end
+    else
+        KeyStatus.Text = "Vui lòng nhập key hoặc lấy key mới"
+        KeyStatus.TextColor3 = Color3.fromRGB(180, 180, 190)
     end
 end)
