@@ -86,14 +86,6 @@ MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Visible = false
--- Hàm mở menu khi key hợp lệ
-_G.OpenLaamHub = function()
-    MainFrame.Visible = true
-    MainFrame.Size = UDim2.new(0, 650, 0, 0)
-    TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
-        Size = UDim2.new(0, 650, 0, 450)
-    }):Play()
-end
 MainFrame.Parent = ScreenGui
 
 local MainCorner = Instance.new("UICorner")
