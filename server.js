@@ -1,5 +1,5 @@
 // ============================================
-// LAAM HUB KEY SERVER
+// LAAM HUB 🇻🇳 KEY SERVER
 // ============================================
 
 const express = require('express');
@@ -80,63 +80,163 @@ app.get('/api/auto-generate', (req, res) => {
                     <meta charset="UTF-8">
                     <title>Laam Hub - Key Của Bạn</title>
                     <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
                         body {
-                            background: linear-gradient(135deg, #1a1a2e, #16213e);
+                            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
                             color: #fff;
-                            font-family: 'Segoe UI', Arial;
+                            font-family: 'Segoe UI', Arial, sans-serif;
                             text-align: center;
-                            padding: 50px;
+                            padding: 50px 20px;
                             min-height: 100vh;
-                            margin: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
                         }
                         .key-box {
-                            background: rgba(0,0,0,0.5);
-                            padding: 40px;
-                            border-radius: 20px;
-                            border: 2px solid #4CAF50;
+                            background: rgba(0,0,0,0.6);
+                            padding: 45px 35px;
+                            border-radius: 24px;
+                            border: 2px solid #da251d;
                             max-width: 600px;
-                            margin: 0 auto;
-                            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+                            width: 100%;
+                            box-shadow: 0 0 40px rgba(218, 37, 29, 0.4);
+                            position: relative;
                         }
-                        h1 { color: #4CAF50; }
+                        .flag {
+                            font-size: 48px;
+                            margin-bottom: 15px;
+                        }
+                        h1 {
+                            color: #ffcd00;
+                            font-size: 28px;
+                            margin-bottom: 8px;
+                            letter-spacing: 1px;
+                        }
+                        .subtitle {
+                            color: #aaa;
+                            font-size: 14px;
+                            margin-bottom: 30px;
+                        }
+                        .key-label {
+                            color: #888;
+                            font-size: 13px;
+                            margin-bottom: 10px;
+                            text-transform: uppercase;
+                            letter-spacing: 2px;
+                        }
                         .key-text {
-                            font-size: 26px;
+                            font-size: 24px;
                             letter-spacing: 3px;
-                            color: #FFD700;
+                            color: #ffcd00;
                             word-break: break-all;
                             font-family: 'Courier New', monospace;
                             padding: 20px;
-                            background: #111;
-                            border-radius: 10px;
-                            margin: 20px 0;
+                            background: #0a0a0a;
+                            border-radius: 12px;
+                            margin: 15px 0 25px;
+                            border: 1px solid #333;
+                            font-weight: bold;
                         }
                         .copy-btn {
-                            background: #4CAF50;
+                            background: linear-gradient(135deg, #da251d, #ffcd00);
                             color: #fff;
                             border: none;
-                            padding: 15px 40px;
-                            border-radius: 10px;
+                            padding: 16px 45px;
+                            border-radius: 12px;
                             font-size: 16px;
                             font-weight: bold;
                             cursor: pointer;
+                            transition: transform 0.2s, box-shadow 0.2s;
+                            letter-spacing: 1px;
                         }
-                        .copy-btn:hover { background: #45a049; }
-                        .info { color: #888; margin-top: 30px; font-size: 14px; }
+                        .copy-btn:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 10px 25px rgba(218, 37, 29, 0.5);
+                        }
+                        .copy-btn:active {
+                            transform: translateY(0);
+                        }
+                        .info {
+                            color: #888;
+                            margin-top: 25px;
+                            font-size: 13px;
+                            line-height: 1.6;
+                        }
+                        .info .highlight {
+                            color: #ffcd00;
+                            font-weight: bold;
+                        }
+                        .steps {
+                            background: rgba(255,255,255,0.05);
+                            padding: 20px;
+                            border-radius: 12px;
+                            margin-top: 25px;
+                            text-align: left;
+                            border-left: 3px solid #da251d;
+                        }
+                        .steps h3 {
+                            color: #ffcd00;
+                            margin-bottom: 12px;
+                            font-size: 15px;
+                        }
+                        .steps ol {
+                            padding-left: 20px;
+                            color: #ccc;
+                            font-size: 13px;
+                            line-height: 1.8;
+                        }
+                        .steps li { margin: 5px 0; }
                     </style>
                 </head>
                 <body>
                     <div class="key-box">
-                        <h1>🐻 LAAM HUB 🇻🇳</h1>
-                        <p>Key của bạn đã sẵn sàng!</p>
+                        <div class="flag">🇻🇳</div>
+                        <h1>LAAM HUB</h1>
+                        <p class="subtitle">Key của bạn đã sẵn sàng!</p>
+                        
+                        <p class="key-label">🔑 Key của bạn</p>
                         <div class="key-text" id="keyText">${key}</div>
+                        
                         <button class="copy-btn" onclick="copyKey()">📋 COPY KEY</button>
-                        <p class="info">⏰ Hết hạn: ${new Date(expires * 1000).toLocaleString('vi-VN')}</p>
+                        
+                        <p class="info">
+                            ⏰ Hết hạn: <span class="highlight">${new Date(expires * 1000).toLocaleString('vi-VN')}</span>
+                        </p>
+                        
+                        <div class="steps">
+                            <h3>📖 Hướng dẫn sử dụng:</h3>
+                            <ol>
+                                <li>Bấm "COPY KEY" ở trên</li>
+                                <li>Mở Laam Hub trong Roblox</li>
+                                <li>Dán key vào ô "Nhập key"</li>
+                                <li>Bấm "XÁC NHẬN KEY" để vào menu</li>
+                            </ol>
+                        </div>
                     </div>
+                    
                     <script>
                         function copyKey() {
-                            navigator.clipboard.writeText("${key}");
-                            event.target.textContent = '✅ ĐÃ COPY!';
-                            setTimeout(() => event.target.textContent = '📋 COPY KEY', 2000);
+                            const key = "${key}";
+                            const btn = event.target;
+                            
+                            navigator.clipboard.writeText(key).then(() => {
+                                btn.textContent = '✅ ĐÃ COPY!';
+                                btn.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+                                setTimeout(() => {
+                                    btn.textContent = '📋 COPY KEY';
+                                    btn.style.background = 'linear-gradient(135deg, #da251d, #ffcd00)';
+                                }, 2000);
+                            }).catch(() => {
+                                // Fallback nếu clipboard không hoạt động
+                                const temp = document.createElement('textarea');
+                                temp.value = key;
+                                document.body.appendChild(temp);
+                                temp.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(temp);
+                                btn.textContent = '✅ ĐÃ COPY!';
+                                setTimeout(() => btn.textContent = '📋 COPY KEY', 2000);
+                            });
                         }
                     </script>
                 </body>
