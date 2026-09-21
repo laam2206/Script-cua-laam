@@ -52,6 +52,18 @@ function generateKeyString() {
     return `LAAM-${rand(4)}-${rand(4)}-${rand(4)}-${rand(4)}`;
 }
 
+// FORMAT THỜI GIAN: X ngày Y giờ Z phút
+function formatTimeLeft(expires, now) {
+    const totalSeconds = expires - now;
+    if (totalSeconds <= 0) return "0 ngày 0 giờ 0 phút";
+    
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    
+    return `${days} ngày ${hours} giờ ${minutes} phút`;
+}
+
 // ============================================
 // API: TỰ ĐỘNG TẠO KEY (cho Link4m)
 // ============================================
@@ -100,30 +112,11 @@ app.get('/api/auto-generate', (req, res) => {
                             max-width: 600px;
                             width: 100%;
                             box-shadow: 0 0 40px rgba(218, 37, 29, 0.4);
-                            position: relative;
                         }
-                        .flag {
-                            font-size: 48px;
-                            margin-bottom: 15px;
-                        }
-                        h1 {
-                            color: #ffcd00;
-                            font-size: 28px;
-                            margin-bottom: 8px;
-                            letter-spacing: 1px;
-                        }
-                        .subtitle {
-                            color: #aaa;
-                            font-size: 14px;
-                            margin-bottom: 30px;
-                        }
-                        .key-label {
-                            color: #888;
-                            font-size: 13px;
-                            margin-bottom: 10px;
-                            text-transform: uppercase;
-                            letter-spacing: 2px;
-                        }
+                        .flag { font-size: 48px; margin-bottom: 15px; }
+                        h1 { color: #ffcd00; font-size: 28px; margin-bottom: 8px; letter-spacing: 1px; }
+                        .subtitle { color: #aaa; font-size: 14px; margin-bottom: 30px; }
+                        .key-label { color: #888; font-size: 13px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
                         .key-text {
                             font-size: 24px;
                             letter-spacing: 3px;
@@ -146,26 +139,12 @@ app.get('/api/auto-generate', (req, res) => {
                             font-size: 16px;
                             font-weight: bold;
                             cursor: pointer;
-                            transition: transform 0.2s, box-shadow 0.2s;
+                            transition: transform 0.2s;
                             letter-spacing: 1px;
                         }
-                        .copy-btn:hover {
-                            transform: translateY(-2px);
-                            box-shadow: 0 10px 25px rgba(218, 37, 29, 0.5);
-                        }
-                        .copy-btn:active {
-                            transform: translateY(0);
-                        }
-                        .info {
-                            color: #888;
-                            margin-top: 25px;
-                            font-size: 13px;
-                            line-height: 1.6;
-                        }
-                        .info .highlight {
-                            color: #ffcd00;
-                            font-weight: bold;
-                        }
+                        .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(218, 37, 29, 0.5); }
+                        .info { color: #888; margin-top: 25px; font-size: 13px; line-height: 1.6; }
+                        .info .highlight { color: #ffcd00; font-weight: bold; }
                         .steps {
                             background: rgba(255,255,255,0.05);
                             padding: 20px;
@@ -174,17 +153,8 @@ app.get('/api/auto-generate', (req, res) => {
                             text-align: left;
                             border-left: 3px solid #da251d;
                         }
-                        .steps h3 {
-                            color: #ffcd00;
-                            margin-bottom: 12px;
-                            font-size: 15px;
-                        }
-                        .steps ol {
-                            padding-left: 20px;
-                            color: #ccc;
-                            font-size: 13px;
-                            line-height: 1.8;
-                        }
+                        .steps h3 { color: #ffcd00; margin-bottom: 12px; font-size: 15px; }
+                        .steps ol { padding-left: 20px; color: #ccc; font-size: 13px; line-height: 1.8; }
                         .steps li { margin: 5px 0; }
                     </style>
                 </head>
@@ -227,7 +197,6 @@ app.get('/api/auto-generate', (req, res) => {
                                     btn.style.background = 'linear-gradient(135deg, #da251d, #ffcd00)';
                                 }, 2000);
                             }).catch(() => {
-                                // Fallback nếu clipboard không hoạt động
                                 const temp = document.createElement('textarea');
                                 temp.value = key;
                                 document.body.appendChild(temp);
@@ -247,7 +216,7 @@ app.get('/api/auto-generate', (req, res) => {
 });
 
 // ============================================
-// API: XÁC THỰC KEY (client Lua gọi)
+// API: XÁC THỰC KEY
 // ============================================
 app.post('/api/verify', (req, res) => {
     const { key, hwid, username } = req.body;
@@ -268,20 +237,26 @@ app.post('/api/verify', (req, res) => {
         if (now > row.expires) {
             return res.json({ valid: false, message: 'Key đã hết hạn!' });
         }
+        
+        // Key chưa gán HWID → gán luôn
         if (!row.hwid) {
             db.run(`UPDATE keys SET hwid = ?, used_by = ?, used_at = ? WHERE key = ?`,
                 [hwid, username || 'Unknown', now, key]);
-            const daysLeft = Math.floor((row.expires - now) / 86400);
+            
+            const timeText = formatTimeLeft(row.expires, now);
             return res.json({
                 valid: true,
-                message: `Kích hoạt thành công! Còn ${daysLeft} ngày.`
+                message: `Kích hoạt thành công! Còn ${timeText}.`
             });
         }
+        
+        // Key đã gán → so sánh HWID
         if (row.hwid !== hwid) {
             return res.json({ valid: false, message: 'Key đã dùng cho thiết bị khác!' });
         }
-        const daysLeft = Math.floor((row.expires - now) / 86400);
-        res.json({ valid: true, message: `Key hợp lệ! Còn ${daysLeft} ngày.` });
+        
+        const timeText = formatTimeLeft(row.expires, now);
+        res.json({ valid: true, message: `Key hợp lệ! Còn ${timeText}.` });
     });
 });
 
