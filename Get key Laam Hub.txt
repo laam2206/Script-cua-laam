@@ -1,0 +1,46 @@
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const crypto = require('crypto');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+// DATABASE
+const db = new sqlite3.Database('./keys.db');
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS keys (...)`);
+    db.run(`CREATE TABLE IF NOT EXISTS logs (...)`);
+});
+
+// HÀM TẠO KEY
+function generateKeyString() { ... }
+
+// API: TẠO KEY (admin)
+app.post('/api/generate', ...);
+
+// API: XÁC THỰC KEY
+app.post('/api/verify', ...);
+
+// API: AUTO-GENERATE (Link4m)  👈 DÁN ĐOẠN MỚI VÀO ĐÂY
+app.get('/api/auto-generate', (req, res) => {
+    // ... code mới không chặn IP
+});
+
+// API: RESET HWID
+app.post('/api/reset-hwid', ...);
+
+// API: DANH SÁCH KEY
+app.post('/api/list', ...);
+
+// API: XÓA KEY
+app.post('/api/delete', ...);
+
+// HÀM LOG
+function logAction(...) { ... }
+
+// HEALTH CHECK
+app.get('/', ...);
+
+// START SERVER
+app.listen(PORT, ...);
