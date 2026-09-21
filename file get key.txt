@@ -1,6 +1,5 @@
 -- ============================================
--- LAAM HUB 🇻🇳 - GET KEY MENU (V2 - Lưu key 2 lớp)
--- Dán vào ĐẦU file script Laam Hub chính
+-- LAAM HUB 🇻🇳 - LOADER (Get Key + Auto Load Script)
 -- ============================================
 
 local HttpService = game:GetService("HttpService")
@@ -14,74 +13,66 @@ local LocalPlayer = Players.LocalPlayer
 local CONFIG = {
     API_URL = "https://script-cua-laam.onrender.com/api/verify",
     LINK4M_URL = "https://link4m.net/juG2sRa",
-    SavedKeyFile = "LaamHub_SavedKey.txt",
+    SCRIPT_URL = "https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt",
 }
 
 -- ============================================
--- LẤY HWID
+-- LẤY HWID (CỐ ĐỊNH)
 -- ============================================
 local function GetHWID()
-    if gethwid then
-        local ok, hwid = pcall(gethwid)
-        if ok and hwid then return hwid end
+    local userId = tostring(LocalPlayer.UserId)
+    local executorName = "unknown"
+    if identifyexecutor then
+        local ok, name = pcall(identifyexecutor)
+        if ok and name then executorName = name end
     end
-    if syn and syn.get_hwid then
-        local ok, hwid = pcall(syn.get_hwid)
-        if ok and hwid then return hwid end
-    end
-    if krnl_gethwid then
-        local ok, hwid = pcall(krnl_gethwid)
-        if ok and hwid then return hwid end
-    end
-    local ok, hwid = pcall(function()
-        return game:GetService("RbxAnalyticsService"):GetClientId()
-    end)
-    if ok and hwid then return hwid end
-    return "UNKNOWN_" .. tostring(LocalPlayer.UserId)
+    return "USER_" .. userId .. "_" .. executorName
 end
 
 -- ============================================
--- LƯU KEY 2 LỚP (file + getgenv)
+-- LƯU KEY 3 LỚP
 -- ============================================
+local KEY_FILES = {"LaamHub_Key.txt", "LaamHub_SavedKey.txt", "laam_key.dat"}
+
 local function SaveKey(key)
-    -- Lớp 1: getgenv (luôn hoạt động)
     getgenv().LaamHub_Key = key
-    
-    -- Lớp 2: file (nếu executor hỗ trợ)
     if writefile then
-        pcall(writefile, CONFIG.SavedKeyFile, key)
+        for _, file in ipairs(KEY_FILES) do
+            pcall(writefile, file, key)
+        end
     end
 end
 
 local function ReadSavedKey()
-    -- Lớp 1: getgenv
     if getgenv().LaamHub_Key and getgenv().LaamHub_Key ~= "" then
         return getgenv().LaamHub_Key
     end
-    
-    -- Lớp 2: file
     if isfile and readfile then
-        local ok, exists = pcall(isfile, CONFIG.SavedKeyFile)
-        if ok and exists then
-            local ok2, content = pcall(readfile, CONFIG.SavedKeyFile)
-            if ok2 and content and content ~= "" then
-                return content
+        for _, file in ipairs(KEY_FILES) do
+            local ok, exists = pcall(isfile, file)
+            if ok and exists then
+                local ok2, content = pcall(readfile, file)
+                if ok2 and content and content ~= "" then
+                    getgenv().LaamHub_Key = content
+                    return content
+                end
             end
         end
     end
-    
     return nil
 end
 
 local function DeleteSavedKey()
     getgenv().LaamHub_Key = nil
     if delfile then
-        pcall(delfile, CONFIG.SavedKeyFile)
+        for _, file in ipairs(KEY_FILES) do
+            pcall(delfile, file)
+        end
     end
 end
 
 -- ============================================
--- XÁC THỰC KEY QUA API (đa executor)
+-- XÁC THỰC KEY QUA API
 -- ============================================
 local function VerifyKeyOnline(inputKey)
     local hwid = GetHWID()
@@ -93,7 +84,6 @@ local function VerifyKeyOnline(inputKey)
     
     local responseBody = nil
     
-    -- Thử request()
     if request then
         local ok, response = pcall(function()
             return request({
@@ -103,12 +93,9 @@ local function VerifyKeyOnline(inputKey)
                 Body = payload,
             })
         end)
-        if ok and response then
-            responseBody = response.Body or response
-        end
+        if ok and response then responseBody = response.Body or response end
     end
     
-    -- Thử syn.request
     if not responseBody and syn and syn.request then
         local ok, response = pcall(function()
             return syn.request({
@@ -118,12 +105,9 @@ local function VerifyKeyOnline(inputKey)
                 Body = payload,
             })
         end)
-        if ok and response then
-            responseBody = response.Body or response
-        end
+        if ok and response then responseBody = response.Body or response end
     end
     
-    -- Thử http_request
     if not responseBody and http_request then
         local ok, response = pcall(function()
             return http_request({
@@ -133,12 +117,9 @@ local function VerifyKeyOnline(inputKey)
                 Body = payload,
             })
         end)
-        if ok and response then
-            responseBody = response.Body or response
-        end
+        if ok and response then responseBody = response.Body or response end
     end
     
-    -- Fallback HttpService
     if not responseBody then
         local ok, response = pcall(function()
             return HttpService:PostAsync(CONFIG.API_URL, payload, Enum.HttpContentType.ApplicationJson)
@@ -156,6 +137,22 @@ local function VerifyKeyOnline(inputKey)
     end
     
     return data.valid, data.message
+end
+
+-- ============================================
+-- LOAD SCRIPT CHÍNH KHI KEY ĐÚNG
+-- ============================================
+local function TryOpenMenu()
+    local ok, err = pcall(function()
+        loadstring(game:HttpGet(CONFIG.SCRIPT_URL))()
+    end)
+    
+    if not ok then
+        warn("Lỗi load script chính: " .. tostring(err))
+        return false
+    end
+    
+    return true
 end
 
 -- ============================================
@@ -442,24 +439,13 @@ KeyBtn.MouseButton1Click:Connect(function()
         KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
         SaveKey(input)
         
-        task.wait(1.5)
+        task.wait(1)
         
-        local closeTween = TweenService:Create(KeyFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-            Size = UDim2.new(0, 0, 0, 0),
-            Position = UDim2.new(0.5, 0, 0.5, 0)
-        })
-        closeTween:Play()
+        -- Đóng GUI key
+        KeyGui:Destroy()
         
-        TweenService:Create(Backdrop, TweenInfo.new(0.3), {
-            BackgroundTransparency = 1
-        }):Play()
-        
-        closeTween.Completed:Connect(function()
-            KeyGui:Destroy()
-            if _G.OpenLaamHub then
-                _G.OpenLaamHub()
-            end
-        end)
+        -- Load script chính
+        TryOpenMenu()
     else
         KeyStatus.Text = message
         KeyStatus.TextColor3 = Color3.fromRGB(255, 120, 120)
@@ -498,8 +484,6 @@ task.spawn(function()
     if saved and saved ~= "" then
         KeyStatus.Text = "Đang kiểm tra key đã lưu..."
         KeyStatus.TextColor3 = Color3.fromRGB(180, 180, 190)
-        
-        -- Hiện key cũ trong ô nhập
         KeyInput.Text = saved
         
         local valid, message = VerifyKeyOnline(saved)
@@ -508,29 +492,12 @@ task.spawn(function()
             KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
             task.wait(1)
             
-            local closeTween = TweenService:Create(KeyFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-                Size = UDim2.new(0, 0, 0, 0),
-                Position = UDim2.new(0.5, 0, 0.5, 0)
-            })
-            closeTween:Play()
-            
-            TweenService:Create(Backdrop, TweenInfo.new(0.3), {
-                BackgroundTransparency = 1
-            }):Play()
-            
-            closeTween.Completed:Connect(function()
-                KeyGui:Destroy()
-                if _G.OpenLaamHub then
-                    _G.OpenLaamHub()
-                end
-            end)
+            KeyGui:Destroy()
+            TryOpenMenu()
         else
             DeleteSavedKey()
             KeyStatus.Text = message .. " Vui lòng lấy key mới!"
             KeyStatus.TextColor3 = Color3.fromRGB(255, 200, 100)
         end
-    else
-        KeyStatus.Text = "Vui lòng nhập key hoặc lấy key mới"
-        KeyStatus.TextColor3 = Color3.fromRGB(180, 180, 190)
     end
 end)
