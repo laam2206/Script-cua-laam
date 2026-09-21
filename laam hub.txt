@@ -1,6 +1,5 @@
 -- ============================================
--- LAAM HUB 🇻🇳 - FULL SCRIPT HOÀN CHỈNH
--- UI mới (Bear Hub style) + Logo gấu tròn nổi
+-- LAAM HUB 🇻🇳 - FULL SCRIPT (MENU NHỎ)
 -- ============================================
 
 local Players = game:GetService("Players")
@@ -34,7 +33,7 @@ LogoScreen.ResetOnSpawn = false
 LogoScreen.Parent = game.CoreGui
 
 local LogoFrame = Instance.new("Frame")
-LogoFrame.Size = UDim2.new(0, 65, 0, 65)
+LogoFrame.Size = UDim2.new(0, 55, 0, 55)
 LogoFrame.Position = UDim2.new(0, 20, 0, 100)
 LogoFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 LogoFrame.BorderSizePixel = 0
@@ -48,12 +47,12 @@ LogoCorner.Parent = LogoFrame
 
 local LogoStroke = Instance.new("UIStroke")
 LogoStroke.Color = Color3.fromRGB(220, 30, 30)
-LogoStroke.Thickness = 3
+LogoStroke.Thickness = 2
 LogoStroke.Parent = LogoFrame
 
 local LogoImage = Instance.new("ImageLabel")
-LogoImage.Size = UDim2.new(1, -8, 1, -8)
-LogoImage.Position = UDim2.new(0, 4, 0, 4)
+LogoImage.Size = UDim2.new(1, -6, 1, -6)
+LogoImage.Position = UDim2.new(0, 3, 0, 3)
 LogoImage.BackgroundTransparency = 1
 LogoImage.Image = "rbxassetid://116199148610919"
 LogoImage.Parent = LogoFrame
@@ -72,7 +71,7 @@ task.spawn(function()
 end)
 
 -- ============================================
--- 2. MENU CHÍNH
+-- 2. MENU CHÍNH (NHỎ GỌN)
 -- ============================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "LaamHubMenu"
@@ -80,17 +79,25 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = game.CoreGui
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 650, 0, 450)
-MainFrame.Position = UDim2.new(0.5, -325, 0.5, -225)
+MainFrame.Size = UDim2.new(0, 480, 0, 330)
+MainFrame.Position = UDim2.new(0.5, -240, 0.5, -165)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Visible = false
+-- Hàm mở menu khi key hợp lệ
+_G.OpenLaamHub = function()
+    MainFrame.Visible = true
+    MainFrame.Size = UDim2.new(0, 650, 0, 0)
+    TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+        Size = UDim2.new(0, 650, 0, 450)
+    }):Play()
+end
 MainFrame.Parent = ScreenGui
 
 local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 14)
+MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = MainFrame
 
 local MainStroke = Instance.new("UIStroke")
@@ -102,25 +109,25 @@ MainStroke.Parent = MainFrame
 -- HEADER
 -- ============================================
 local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 70)
+Header.Size = UDim2.new(1, 0, 0, 50)
 Header.BackgroundColor3 = Color3.fromRGB(24, 24, 28)
 Header.BorderSizePixel = 0
 Header.Parent = MainFrame
 
 local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 14)
+HeaderCorner.CornerRadius = UDim.new(0, 10)
 HeaderCorner.Parent = Header
 
 local HeaderFix = Instance.new("Frame")
-HeaderFix.Size = UDim2.new(1, 0, 0, 20)
-HeaderFix.Position = UDim2.new(0, 0, 1, -20)
+HeaderFix.Size = UDim2.new(1, 0, 0, 15)
+HeaderFix.Position = UDim2.new(0, 0, 1, -15)
 HeaderFix.BackgroundColor3 = Color3.fromRGB(24, 24, 28)
 HeaderFix.BorderSizePixel = 0
 HeaderFix.Parent = Header
 
 local HeaderLogo = Instance.new("Frame")
-HeaderLogo.Size = UDim2.new(0, 48, 0, 48)
-HeaderLogo.Position = UDim2.new(0, 12, 0, 11)
+HeaderLogo.Size = UDim2.new(0, 36, 0, 36)
+HeaderLogo.Position = UDim2.new(0, 10, 0, 7)
 HeaderLogo.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 HeaderLogo.BorderSizePixel = 0
 HeaderLogo.Parent = Header
@@ -141,71 +148,71 @@ HeaderLogoImgCorner.CornerRadius = UDim.new(1, 0)
 HeaderLogoImgCorner.Parent = HeaderLogoImg
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0, 420, 0, 22)
-Title.Position = UDim2.new(0, 72, 0, 14)
+Title.Size = UDim2.new(0, 320, 0, 18)
+Title.Position = UDim2.new(0, 52, 0, 8)
 Title.BackgroundTransparency = 1
-Title.Text = "Laam Hub 🇻🇳 | " .. LocalPlayer.Name .. " | Script Tổng hợp"
+Title.Text = "Laam Hub 🇻🇳 | " .. LocalPlayer.Name
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 16
+Title.TextSize = 12
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
 local SubTitle = Instance.new("TextLabel")
-SubTitle.Size = UDim2.new(0, 400, 0, 16)
-SubTitle.Position = UDim2.new(0, 72, 0, 38)
+SubTitle.Size = UDim2.new(0, 300, 0, 12)
+SubTitle.Position = UDim2.new(0, 52, 0, 27)
 SubTitle.BackgroundTransparency = 1
-SubTitle.Text = "Laam Hub🇻🇳"
+SubTitle.Text = "Script Tổng hợp"
 SubTitle.TextColor3 = Color3.fromRGB(140, 140, 145)
-SubTitle.TextSize = 11
+SubTitle.TextSize = 9
 SubTitle.Font = Enum.Font.Gotham
 SubTitle.TextXAlignment = Enum.TextXAlignment.Left
 SubTitle.Parent = Header
 
 local MinBtn = Instance.new("TextButton")
-MinBtn.Size = UDim2.new(0, 28, 0, 28)
-MinBtn.Position = UDim2.new(1, -72, 0, 20)
+MinBtn.Size = UDim2.new(0, 22, 0, 22)
+MinBtn.Position = UDim2.new(1, -54, 0, 14)
 MinBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
 MinBtn.Text = "—"
 MinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-MinBtn.TextSize = 16
+MinBtn.TextSize = 13
 MinBtn.Font = Enum.Font.GothamBold
 MinBtn.BorderSizePixel = 0
 MinBtn.AutoButtonColor = false
 MinBtn.Parent = Header
 
 local MinCorner = Instance.new("UICorner")
-MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.CornerRadius = UDim.new(0, 5)
 MinCorner.Parent = MinBtn
 
 local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(0, 28, 0, 28)
-CloseBtn.Position = UDim2.new(1, -40, 0, 20)
+CloseBtn.Size = UDim2.new(0, 22, 0, 22)
+CloseBtn.Position = UDim2.new(1, -30, 0, 14)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 CloseBtn.Text = "✕"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextSize = 14
+CloseBtn.TextSize = 11
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.BorderSizePixel = 0
 CloseBtn.AutoButtonColor = false
 CloseBtn.Parent = Header
 
 local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.CornerRadius = UDim.new(0, 5)
 CloseCorner.Parent = CloseBtn
 
 -- ============================================
 -- SIDEBAR
 -- ============================================
 local Sidebar = Instance.new("Frame")
-Sidebar.Size = UDim2.new(0, 210, 1, -85)
-Sidebar.Position = UDim2.new(0, 8, 0, 77)
+Sidebar.Size = UDim2.new(0, 145, 1, -62)
+Sidebar.Position = UDim2.new(0, 6, 0, 56)
 Sidebar.BackgroundColor3 = Color3.fromRGB(22, 22, 25)
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = MainFrame
 
 local SidebarCorner = Instance.new("UICorner")
-SidebarCorner.CornerRadius = UDim.new(0, 8)
+SidebarCorner.CornerRadius = UDim.new(0, 6)
 SidebarCorner.Parent = Sidebar
 
 local SidebarScroll = Instance.new("ScrollingFrame")
@@ -219,44 +226,44 @@ SidebarScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 SidebarScroll.Parent = Sidebar
 
 local SidebarList = Instance.new("UIListLayout")
-SidebarList.Padding = UDim.new(0, 3)
+SidebarList.Padding = UDim.new(0, 2)
 SidebarList.SortOrder = Enum.SortOrder.LayoutOrder
 SidebarList.Parent = SidebarScroll
 
 local SidebarPad = Instance.new("UIPadding")
-SidebarPad.PaddingTop = UDim.new(0, 8)
-SidebarPad.PaddingLeft = UDim.new(0, 6)
-SidebarPad.PaddingRight = UDim.new(0, 6)
+SidebarPad.PaddingTop = UDim.new(0, 6)
+SidebarPad.PaddingLeft = UDim.new(0, 5)
+SidebarPad.PaddingRight = UDim.new(0, 5)
 SidebarPad.Parent = SidebarScroll
 
 -- ============================================
 -- CONTENT
 -- ============================================
 local Content = Instance.new("Frame")
-Content.Size = UDim2.new(1, -230, 1, -85)
-Content.Position = UDim2.new(0, 222, 0, 77)
+Content.Size = UDim2.new(1, -160, 1, -62)
+Content.Position = UDim2.new(0, 154, 0, 56)
 Content.BackgroundColor3 = Color3.fromRGB(22, 22, 25)
 Content.BorderSizePixel = 0
 Content.Parent = MainFrame
 
 local ContentCorner = Instance.new("UICorner")
-ContentCorner.CornerRadius = UDim.new(0, 8)
+ContentCorner.CornerRadius = UDim.new(0, 6)
 ContentCorner.Parent = Content
 
 local ContentTitle = Instance.new("TextLabel")
-ContentTitle.Size = UDim2.new(1, -20, 0, 30)
-ContentTitle.Position = UDim2.new(0, 10, 0, 10)
+ContentTitle.Size = UDim2.new(1, -16, 0, 22)
+ContentTitle.Position = UDim2.new(0, 8, 0, 6)
 ContentTitle.BackgroundTransparency = 1
 ContentTitle.Text = ""
 ContentTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-ContentTitle.TextSize = 16
+ContentTitle.TextSize = 12
 ContentTitle.Font = Enum.Font.GothamBold
 ContentTitle.TextXAlignment = Enum.TextXAlignment.Left
 ContentTitle.Parent = Content
 
 local ContentScroll = Instance.new("ScrollingFrame")
-ContentScroll.Size = UDim2.new(1, -20, 1, -50)
-ContentScroll.Position = UDim2.new(0, 10, 0, 45)
+ContentScroll.Size = UDim2.new(1, -16, 1, -38)
+ContentScroll.Position = UDim2.new(0, 8, 0, 32)
 ContentScroll.BackgroundTransparency = 1
 ContentScroll.BorderSizePixel = 0
 ContentScroll.ScrollBarThickness = 3
@@ -266,7 +273,7 @@ ContentScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 ContentScroll.Parent = Content
 
 local ContentList = Instance.new("UIListLayout")
-ContentList.Padding = UDim.new(0, 5)
+ContentList.Padding = UDim.new(0, 4)
 ContentList.SortOrder = Enum.SortOrder.LayoutOrder
 ContentList.Parent = ContentScroll
 
@@ -285,7 +292,7 @@ function MakeTab(config)
     table.insert(allTabs, tabData)
 
     local Btn = Instance.new("TextButton")
-    Btn.Size = UDim2.new(1, 0, 0, 34)
+    Btn.Size = UDim2.new(1, 0, 0, 26)
     Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 34)
     Btn.Text = ""
     Btn.BorderSizePixel = 0
@@ -293,27 +300,28 @@ function MakeTab(config)
     Btn.Parent = SidebarScroll
 
     local BtnCorner = Instance.new("UICorner")
-    BtnCorner.CornerRadius = UDim.new(0, 6)
+    BtnCorner.CornerRadius = UDim.new(0, 5)
     BtnCorner.Parent = Btn
 
     local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.new(1, -30, 1, 0)
-    Label.Position = UDim2.new(0, 12, 0, 0)
+    Label.Size = UDim2.new(1, -24, 1, 0)
+    Label.Position = UDim2.new(0, 8, 0, 0)
     Label.BackgroundTransparency = 1
     Label.Text = config.Name
     Label.TextColor3 = Color3.fromRGB(200, 200, 205)
-    Label.TextSize = 12
+    Label.TextSize = 10
     Label.Font = Enum.Font.Gotham
     Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.TextTruncate = Enum.TextTruncate.AtEnd
     Label.Parent = Btn
 
     local Arrow = Instance.new("TextLabel")
-    Arrow.Size = UDim2.new(0, 20, 1, 0)
-    Arrow.Position = UDim2.new(1, -22, 0, 0)
+    Arrow.Size = UDim2.new(0, 16, 1, 0)
+    Arrow.Position = UDim2.new(1, -18, 0, 0)
     Arrow.BackgroundTransparency = 1
     Arrow.Text = "›"
     Arrow.TextColor3 = Color3.fromRGB(120, 120, 125)
-    Arrow.TextSize = 16
+    Arrow.TextSize = 13
     Arrow.Font = Enum.Font.GothamBold
     Arrow.Parent = Btn
 
@@ -343,7 +351,7 @@ function MakeTab(config)
         end
         for _, item in ipairs(tabData.items) do
             local ItemBtn = Instance.new("TextButton")
-            ItemBtn.Size = UDim2.new(1, 0, 0, 38)
+            ItemBtn.Size = UDim2.new(1, 0, 0, 28)
             ItemBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
             ItemBtn.Text = ""
             ItemBtn.BorderSizePixel = 0
@@ -351,18 +359,19 @@ function MakeTab(config)
             ItemBtn.Parent = ContentScroll
 
             local ItemCorner = Instance.new("UICorner")
-            ItemCorner.CornerRadius = UDim.new(0, 6)
+            ItemCorner.CornerRadius = UDim.new(0, 5)
             ItemCorner.Parent = ItemBtn
 
             local ItemLabel = Instance.new("TextLabel")
-            ItemLabel.Size = UDim2.new(1, -20, 1, 0)
-            ItemLabel.Position = UDim2.new(0, 12, 0, 0)
+            ItemLabel.Size = UDim2.new(1, -16, 1, 0)
+            ItemLabel.Position = UDim2.new(0, 10, 0, 0)
             ItemLabel.BackgroundTransparency = 1
             ItemLabel.Text = item.Name
             ItemLabel.TextColor3 = Color3.fromRGB(220, 220, 225)
-            ItemLabel.TextSize = 13
+            ItemLabel.TextSize = 11
             ItemLabel.Font = Enum.Font.Gotham
             ItemLabel.TextXAlignment = Enum.TextXAlignment.Left
+            ItemLabel.TextTruncate = Enum.TextTruncate.AtEnd
             ItemLabel.Parent = ItemBtn
 
             ItemBtn.MouseEnter:Connect(function()
@@ -425,7 +434,18 @@ function AddButton(tabData, config)
 end
 
 -- ============================================
--- 3. BẤM LOGO → BẬT/TẮT MENU
+-- 3. HÀM MỞ MENU (CHO LOADER GỌI)
+-- ============================================
+_G.OpenLaamHub = function()
+    MainFrame.Visible = true
+    MainFrame.Size = UDim2.new(0, 480, 0, 0)
+    TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+        Size = UDim2.new(0, 480, 0, 330)
+    }):Play()
+end
+
+-- ============================================
+-- 4. BẤM LOGO → BẬT/TẮT MENU
 -- ============================================
 local menuOpen = false
 
@@ -435,16 +455,16 @@ LogoFrame.InputBegan:Connect(function(input)
         menuOpen = not menuOpen
         if menuOpen then
             MainFrame.Visible = true
-            MainFrame.Size = UDim2.new(0, 650, 0, 0)
+            MainFrame.Size = UDim2.new(0, 480, 0, 0)
             TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 650, 0, 450)
+                Size = UDim2.new(0, 480, 0, 330)
             }):Play()
             TweenService:Create(LogoStroke, TweenInfo.new(0.2), {
                 Color = Color3.fromRGB(80, 180, 80)
             }):Play()
         else
             local tween = TweenService:Create(MainFrame, TweenInfo.new(0.2), {
-                Size = UDim2.new(0, 650, 0, 0)
+                Size = UDim2.new(0, 480, 0, 0)
             })
             tween:Play()
             tween.Completed:Connect(function()
@@ -459,19 +479,19 @@ end)
 
 LogoFrame.MouseEnter:Connect(function()
     TweenService:Create(LogoFrame, TweenInfo.new(0.15), {
-        Size = UDim2.new(0, 73, 0, 73)
+        Size = UDim2.new(0, 63, 0, 63)
     }):Play()
 end)
 LogoFrame.MouseLeave:Connect(function()
     TweenService:Create(LogoFrame, TweenInfo.new(0.15), {
-        Size = UDim2.new(0, 65, 0, 65)
+        Size = UDim2.new(0, 55, 0, 55)
     }):Play()
 end)
 
 CloseBtn.MouseButton1Click:Connect(function()
     menuOpen = false
     local tween = TweenService:Create(MainFrame, TweenInfo.new(0.2), {
-        Size = UDim2.new(0, 650, 0, 0)
+        Size = UDim2.new(0, 480, 0, 0)
     })
     tween:Play()
     tween.Completed:Connect(function()
@@ -482,7 +502,7 @@ end)
 MinBtn.MouseButton1Click:Connect(function()
     menuOpen = false
     local tween = TweenService:Create(MainFrame, TweenInfo.new(0.2), {
-        Size = UDim2.new(0, 650, 0, 0)
+        Size = UDim2.new(0, 480, 0, 0)
     })
     tween:Play()
     tween.Completed:Connect(function()
@@ -491,7 +511,7 @@ MinBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- 4. TAB + BUTTON
+-- 5. TAB + BUTTON (giữ nguyên)
 -- ============================================
 
 ------ Tab
@@ -514,6 +534,8 @@ local Tab16o = MakeTab({Name = "Kick a Lucky Block "})
 local Tab17o = MakeTab({Name = "Evomon"})
 local Tab18o = MakeTab({Name = "Racket Rivals"})
 local Tab19o = MakeTab({Name = "Fisch"})
+
+------- BUTTON (giữ nguyên tất cả)
 
 ------- BUTTON
 
