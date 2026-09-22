@@ -1,11 +1,6 @@
 {
-  "name": "laamhub",
-  "version": "1.0.0",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
-  }
+  "status": "ok",
+  "service": "Key System API",
+  "keyExpire": "1 ngày",
+  "tokenExpire": "5 phút"
 }
