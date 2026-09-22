@@ -1,305 +1,474 @@
-// ============================================
-// LAAM HUB 🇻🇳 KEY SERVER
-// ============================================
-
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const app = express();
-const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
 
-// DATABASE
-const db = new sqlite3.Database('./keys.db');
+// ============================================
+// CẤU HÌNH
+// ============================================
+const ADMIN_TOKEN = "laam-auto-secret-2026";  // Token admin (đổi thành của bạn)
+const ADMIN_SECRET = "ADMIN_SECRET_123";       // Mật khẩu admin 2
 
-db.serialize(() => {
-    db.run(`
-        CREATE TABLE IF NOT EXISTS keys (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            key TEXT UNIQUE NOT NULL,
-            hwid TEXT DEFAULT NULL,
-            expires INTEGER NOT NULL,
-            created INTEGER NOT NULL,
-            note TEXT DEFAULT '',
-            used_by TEXT DEFAULT NULL,
-            used_at INTEGER DEFAULT NULL,
-            active INTEGER DEFAULT 1
-        )
-    `);
-    db.run(`
-        CREATE TABLE IF NOT EXISTS logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            key TEXT,
-            hwid TEXT,
-            action TEXT,
-            ip TEXT,
-            time INTEGER
-        )
-    `);
-    console.log('✅ Database ready');
-});
+// ============================================
+// DANH SÁCH KEY
+// type: "forever" = vĩnh viễn (không có expires)
+// type: "temp"    = có thời hạn (có expires)
+// hwid: null      = chưa gán máy
+// hwid: "xxx"     = đã gán máy
+// ============================================
+const VALID_KEYS = {
+    // 🔑 KEY VĨNH VIỄN MẶC ĐỊNH
+    "LaamHub2024": { type: "forever", hwid: null },
+    "LaamVip":     { type: "forever", hwid: null },
+    "1234":        { type: "forever", hwid: null },
+    "KEYVIP2025":  { type: "forever", hwid: null },
+};
 
-// TẠO KEY RANDOM
-function generateKeyString() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const rand = (n) => {
-        let s = '';
-        for (let i = 0; i < n; i++) {
-            s += chars[Math.floor(Math.random() * chars.length)];
-        }
-        return s;
-    };
-    return `LAAM-${rand(4)}-${rand(4)}-${rand(4)}-${rand(4)}`;
-}
-
-// FORMAT THỜI GIAN: X ngày Y giờ Z phút
-function formatTimeLeft(expires, now) {
-    const totalSeconds = expires - now;
-    if (totalSeconds <= 0) return "0 ngày 0 giờ 0 phút";
-    
-    const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor((totalSeconds % 86400) / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    
-    return `${days} ngày ${hours} giờ ${minutes} phút`;
+// ============================================
+// HÀM TÍNH NGÀY HẾT HẠN
+// ============================================
+function calculateExpiry(days) {
+    const exp = new Date();
+    exp.setDate(exp.getDate() + parseInt(days));
+    return exp.toISOString().split('T')[0];  // YYYY-MM-DD
 }
 
 // ============================================
-// API: TỰ ĐỘNG TẠO KEY (cho Link4m)
+// HÀM TẠO KEY NGẪU NHIÊN
+// ============================================
+function generateRandomKey() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let key = "LAAM";
+    for (let i = 0; i < 4; i++) {
+        key += "-";
+        for (let j = 0; j < 4; j++) {
+            key += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+    }
+    return key;
+}
+
+// ============================================
+// HÀM KIỂM TRA KEY
+// ============================================
+function checkKey(key, hwid) {
+    const keyData = VALID_KEYS[key];
+    
+    // 1. Key không tồn tại
+    if (!keyData) {
+        return { valid: false, message: "Key không tồn tại" };
+    }
+    
+    // 2. CHỈ check expires khi type === "temp"
+    if (keyData.type === "temp") {
+        if (!keyData.expires) {
+            return { valid: false, message: "Key lỗi: thiếu ngày hết hạn" };
+        }
+        
+        const now = new Date();
+        const expires = new Date(keyData.expires);
+        
+        if (isNaN(expires.getTime())) {
+            return { valid: false, message: "Key lỗi: ngày hết hạn không hợp lệ" };
+        }
+        
+        if (now > expires) {
+            return { 
+                valid: false, 
+                message: "Key đã hết hạn vào " + keyData.expires,
+                expired: true
+            };
+        }
+    }
+    // Key forever → KHÔNG check expires
+    
+    // 3. Check HWID
+    if (!hwid || hwid === "unknown") {
+        return { valid: false, message: "Không lấy được HWID" };
+    }
+    
+    // 4. Gán HWID lần đầu
+    if (keyData.hwid === null) {
+        keyData.hwid = hwid;
+        console.log(`[LOCK] Key ${key} gán HWID: ${hwid.substring(0, 8)}...`);
+    } else if (keyData.hwid !== hwid) {
+        return { 
+            valid: false, 
+            message: "Key đã dùng trên máy khác!",
+            hwidMismatch: true
+        };
+    }
+    
+    // 5. Trả về kết quả
+    if (keyData.type === "forever") {
+        return { 
+            valid: true, 
+            message: "Key vĩnh viễn hợp lệ",
+            type: "forever"
+        };
+    } else {
+        const now = new Date();
+        const expires = new Date(keyData.expires);
+        const daysLeft = Math.ceil((expires - now) / (1000 * 60 * 60 * 24));
+        
+        return { 
+            valid: true, 
+            message: `Key hợp lệ - còn ${daysLeft} ngày`,
+            type: "temp",
+            expires: keyData.expires,
+            daysLeft: daysLeft
+        };
+    }
+}
+
+// ============================================
+// API CHECK KEY
+// ============================================
+app.post('/api/checkkey', (req, res) => {
+    const { key, hwid } = req.body;
+    
+    if (!key || key.trim() === "") {
+        return res.json({ valid: false, message: "Thiếu key" });
+    }
+    
+    const result = checkKey(key.trim(), hwid);
+    console.log(`[${result.valid ? 'OK' : 'FAIL'}] ${key} | ${result.message}`);
+    return res.json(result);
+});
+
+// ============================================
+// API AUTO-GENERATE (TỰ ĐỘNG TẠO KEY)
+// Link: /api/auto-generate?token=...&days=...
+// days=0 hoặc forever → KEY VĨNH VIỄN
+// days=1 → key 1 ngày
+// days=7 → key 1 tuần
+// days=30 → key 1 tháng
+// days=365 → key 1 năm
 // ============================================
 app.get('/api/auto-generate', (req, res) => {
     const { token, days } = req.query;
     
-    const AUTO_TOKEN = process.env.AUTO_TOKEN || 'laam-auto-secret-2026';
-    if (token !== AUTO_TOKEN) {
-        return res.status(403).send('Access denied');
+    if (token !== ADMIN_TOKEN) {
+        return res.json({ success: false, message: "Sai token" });
     }
     
-    const now = Math.floor(Date.now() / 1000);
-    const key = generateKeyString();
-    const expires = now + ((days || 1) * 86400);
+    const newKey = generateRandomKey();
     
-    db.run(
-        `INSERT INTO keys (key, expires, created, note) VALUES (?, ?, ?, ?)`,
-        [key, expires, now, 'Auto via Link4m'],
-        function(err) {
-            if (err) return res.send('Lỗi tạo key!');
-            
-            res.send(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Laam Hub - Key Của Bạn</title>
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body {
-                            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-                            color: #fff;
-                            font-family: 'Segoe UI', Arial, sans-serif;
-                            text-align: center;
-                            padding: 50px 20px;
-                            min-height: 100vh;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                        .key-box {
-                            background: rgba(0,0,0,0.6);
-                            padding: 45px 35px;
-                            border-radius: 24px;
-                            border: 2px solid #da251d;
-                            max-width: 600px;
-                            width: 100%;
-                            box-shadow: 0 0 40px rgba(218, 37, 29, 0.4);
-                        }
-                        .flag { font-size: 48px; margin-bottom: 15px; }
-                        h1 { color: #ffcd00; font-size: 28px; margin-bottom: 8px; letter-spacing: 1px; }
-                        .subtitle { color: #aaa; font-size: 14px; margin-bottom: 30px; }
-                        .key-label { color: #888; font-size: 13px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-                        .key-text {
-                            font-size: 24px;
-                            letter-spacing: 3px;
-                            color: #ffcd00;
-                            word-break: break-all;
-                            font-family: 'Courier New', monospace;
-                            padding: 20px;
-                            background: #0a0a0a;
-                            border-radius: 12px;
-                            margin: 15px 0 25px;
-                            border: 1px solid #333;
-                            font-weight: bold;
-                        }
-                        .copy-btn {
-                            background: linear-gradient(135deg, #da251d, #ffcd00);
-                            color: #fff;
-                            border: none;
-                            padding: 16px 45px;
-                            border-radius: 12px;
-                            font-size: 16px;
-                            font-weight: bold;
-                            cursor: pointer;
-                            transition: transform 0.2s;
-                            letter-spacing: 1px;
-                        }
-                        .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(218, 37, 29, 0.5); }
-                        .info { color: #888; margin-top: 25px; font-size: 13px; line-height: 1.6; }
-                        .info .highlight { color: #ffcd00; font-weight: bold; }
-                        .steps {
-                            background: rgba(255,255,255,0.05);
-                            padding: 20px;
-                            border-radius: 12px;
-                            margin-top: 25px;
-                            text-align: left;
-                            border-left: 3px solid #da251d;
-                        }
-                        .steps h3 { color: #ffcd00; margin-bottom: 12px; font-size: 15px; }
-                        .steps ol { padding-left: 20px; color: #ccc; font-size: 13px; line-height: 1.8; }
-                        .steps li { margin: 5px 0; }
-                    </style>
-                </head>
-                <body>
-                    <div class="key-box">
-                        <div class="flag">🇻🇳</div>
-                        <h1>LAAM HUB</h1>
-                        <p class="subtitle">Key của bạn đã sẵn sàng!</p>
-                        
-                        <p class="key-label">🔑 Key của bạn</p>
-                        <div class="key-text" id="keyText">${key}</div>
-                        
-                        <button class="copy-btn" onclick="copyKey()">📋 COPY KEY</button>
-                        
-                        <p class="info">
-                            ⏰ Hết hạn: <span class="highlight">${new Date(expires * 1000).toLocaleString('vi-VN')}</span>
-                        </p>
-                        
-                        <div class="steps">
-                            <h3>📖 Hướng dẫn sử dụng:</h3>
-                            <ol>
-                                <li>Bấm "COPY KEY" ở trên</li>
-                                <li>Mở Laam Hub trong Roblox</li>
-                                <li>Dán key vào ô "Nhập key"</li>
-                                <li>Bấm "XÁC NHẬN KEY" để vào menu</li>
-                            </ol>
-                        </div>
-                    </div>
-                    
-                    <script>
-                        function copyKey() {
-                            const key = "${key}";
-                            const btn = event.target;
-                            
-                            navigator.clipboard.writeText(key).then(() => {
-                                btn.textContent = '✅ ĐÃ COPY!';
-                                btn.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
-                                setTimeout(() => {
-                                    btn.textContent = '📋 COPY KEY';
-                                    btn.style.background = 'linear-gradient(135deg, #da251d, #ffcd00)';
-                                }, 2000);
-                            }).catch(() => {
-                                const temp = document.createElement('textarea');
-                                temp.value = key;
-                                document.body.appendChild(temp);
-                                temp.select();
-                                document.execCommand('copy');
-                                document.body.removeChild(temp);
-                                btn.textContent = '✅ ĐÃ COPY!';
-                                setTimeout(() => btn.textContent = '📋 COPY KEY', 2000);
-                            });
-                        }
-                    </script>
-                </body>
-                </html>
-            `);
-        }
-    );
-});
-
-// ============================================
-// API: XÁC THỰC KEY
-// ============================================
-app.post('/api/verify', (req, res) => {
-    const { key, hwid, username } = req.body;
-    
-    if (!key || !hwid) {
-        return res.json({ valid: false, message: 'Thiếu key hoặc HWID!' });
+    // ✅ days=0 hoặc forever → KEY VĨNH VIỄN
+    if (days === "0" || days === "forever" || days === "lifetime") {
+        VALID_KEYS[newKey] = { type: "forever", hwid: null };
+        console.log(`[AUTO] Tạo key VĨNH VIỄN: ${newKey}`);
+        
+        return res.json({
+            success: true,
+            key: newKey,
+            type: "forever",
+            message: "Key VĨNH VIỄN đã tạo!"
+        });
     }
     
-    const now = Math.floor(Date.now() / 1000);
+    // Key có thời hạn
+    const numDays = parseInt(days) || 1;
+    const expires = calculateExpiry(numDays);
     
-    db.get(`SELECT * FROM keys WHERE key = ?`, [key], (err, row) => {
-        if (err || !row) {
-            return res.json({ valid: false, message: 'Key không tồn tại!' });
-        }
-        if (row.active !== 1) {
-            return res.json({ valid: false, message: 'Key đã bị vô hiệu hóa!' });
-        }
-        if (now > row.expires) {
-            return res.json({ valid: false, message: 'Key đã hết hạn!' });
-        }
-        
-        // Key chưa gán HWID → gán luôn
-        if (!row.hwid) {
-            db.run(`UPDATE keys SET hwid = ?, used_by = ?, used_at = ? WHERE key = ?`,
-                [hwid, username || 'Unknown', now, key]);
-            
-            const timeText = formatTimeLeft(row.expires, now);
-            return res.json({
-                valid: true,
-                message: `Kích hoạt thành công! Còn ${timeText}.`
-            });
-        }
-        
-        // Key đã gán → so sánh HWID
-        if (row.hwid !== hwid) {
-            return res.json({ valid: false, message: 'Key đã dùng cho thiết bị khác!' });
-        }
-        
-        const timeText = formatTimeLeft(row.expires, now);
-        res.json({ valid: true, message: `Key hợp lệ! Còn ${timeText}.` });
+    VALID_KEYS[newKey] = {
+        type: "temp",
+        expires: expires,
+        duration: numDays + "day",
+        hwid: null
+    };
+    
+    console.log(`[AUTO] Tạo key ${numDays} ngày: ${newKey} | Hết hạn: ${expires}`);
+    
+    return res.json({
+        success: true,
+        key: newKey,
+        type: "temp",
+        duration: numDays + " ngày",
+        expires: expires,
+        message: `Key ${numDays} ngày đã tạo!`
     });
 });
 
 // ============================================
-// API: TẠO KEY THỦ CÔNG (admin)
+// API TẠO KEY (ADMIN)
+// Body: { adminToken, newKey, duration }
+// duration: "lifetime" / "1day" / "1week" / "1month" / "1year"
 // ============================================
-app.post('/api/generate', (req, res) => {
-    const { adminKey, days, note } = req.body;
-    const ADMIN_KEY = process.env.ADMIN_KEY || 'laam-admin-secret-2026';
+app.post('/api/createkey', (req, res) => {
+    const { adminToken, newKey, duration, expires } = req.body;
     
-    if (adminKey !== ADMIN_KEY) {
-        return res.json({ success: false, message: 'Sai admin key!' });
+    if (adminToken !== ADMIN_SECRET) {
+        return res.json({ success: false, message: "Sai admin token" });
     }
     
-    const key = generateKeyString();
-    const now = Math.floor(Date.now() / 1000);
-    let expires;
-    if (days === 0 || days === 'forever') {
-        expires = 9999999999;
-    } else {
-        expires = now + ((days || 7) * 86400);
+    if (!newKey || newKey.trim() === "") {
+        return res.json({ success: false, message: "Key trống" });
     }
     
-    db.run(`INSERT INTO keys (key, expires, created, note) VALUES (?, ?, ?, ?)`,
-        [key, expires, now, note || ''],
-        function(err) {
-            if (err) return res.json({ success: false, message: 'Lỗi!' });
-            res.json({
-                success: true,
-                key: key,
-                days: days === 0 ? 'Vĩnh viễn' : (days || 7),
-                expires: days === 0 ? 'Vĩnh viễn' : new Date(expires * 1000).toLocaleString('vi-VN')
-            });
+    if (VALID_KEYS[newKey]) {
+        return res.json({ success: false, message: "Key đã tồn tại" });
+    }
+    
+    // Key vĩnh viễn
+    if (duration === "lifetime" || duration === "forever") {
+        VALID_KEYS[newKey.trim()] = { type: "forever", hwid: null };
+        return res.json({ 
+            success: true, 
+            message: "Đã tạo key VĨNH VIỄN!", 
+            key: newKey,
+            type: "forever"
         });
+    }
+    
+    // Key có thời hạn
+    let expDate;
+    if (expires) {
+        const check = new Date(expires);
+        if (isNaN(check.getTime())) {
+            return res.json({ success: false, message: "Ngày không hợp lệ! Dùng YYYY-MM-DD" });
+        }
+        expDate = expires;
+    } else if (duration) {
+        const daysMap = {
+            "1day": 1,
+            "1week": 7,
+            "1month": 30,
+            "3month": 90,
+            "6month": 180,
+            "1year": 365
+        };
+        expDate = calculateExpiry(daysMap[duration] || 7);
+    } else {
+        return res.json({ success: false, message: "Thiếu duration hoặc expires" });
+    }
+    
+    VALID_KEYS[newKey.trim()] = { 
+        type: "temp", 
+        expires: expDate,
+        duration: duration || "custom",
+        hwid: null 
+    };
+    
+    return res.json({ 
+        success: true, 
+        message: `Đã tạo key ${duration} (hết hạn: ${expDate})!`, 
+        key: newKey,
+        type: "temp",
+        expires: expDate
+    });
 });
 
 // ============================================
-// HEALTH CHECK
+// API RESET HWID
+// ============================================
+app.post('/api/resethwid', (req, res) => {
+    const { adminToken, key } = req.body;
+    
+    if (adminToken !== ADMIN_SECRET) {
+        return res.json({ success: false, message: "Sai admin token" });
+    }
+    
+    if (!VALID_KEYS[key]) {
+        return res.json({ success: false, message: "Key không tồn tại" });
+    }
+    
+    VALID_KEYS[key].hwid = null;
+    return res.json({ success: true, message: `Đã gỡ khóa HWID cho key ${key}` });
+});
+
+// ============================================
+// API XÓA KEY
+// ============================================
+app.post('/api/deletekey', (req, res) => {
+    const { adminToken, key } = req.body;
+    
+    if (adminToken !== ADMIN_SECRET) {
+        return res.json({ success: false, message: "Sai admin token" });
+    }
+    
+    if (VALID_KEYS[key]) {
+        delete VALID_KEYS[key];
+        return res.json({ success: true, message: "Đã xóa key!" });
+    }
+    
+    return res.json({ success: false, message: "Key không tồn tại" });
+});
+
+// ============================================
+// API LIỆT KÊ KEY
+// ============================================
+app.get('/api/listkeys', (req, res) => {
+    const { token } = req.query;
+    
+    if (token !== ADMIN_SECRET) {
+        return res.json({ success: false, message: "Sai admin token" });
+    }
+    
+    const list = [];
+    const now = new Date();
+    
+    for (const [key, data] of Object.entries(VALID_KEYS)) {
+        const item = {
+            key: key,
+            type: data.type,
+            duration: data.duration || "vĩnh viễn",
+            hwid: data.hwid ? (data.hwid.substring(0, 8) + "...") : "chưa khóa"
+        };
+        
+        if (data.type === "temp") {
+            const expires = new Date(data.expires);
+            item.expires = data.expires;
+            item.daysLeft = Math.ceil((expires - now) / (1000 * 60 * 60 * 24));
+            item.expired = now > expires;
+        }
+        
+        list.push(item);
+    }
+    
+    return res.json({ 
+        success: true, 
+        total: Object.keys(VALID_KEYS).length,
+        keys: list
+    });
+});
+
+// ============================================
+// TRANG WEB LẤY KEY
 // ============================================
 app.get('/', (req, res) => {
-    res.json({ status: 'online', name: 'Laam Hub Key Server' });
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Laam Hub - Lấy Key</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #121216 0%, #1a1a22 100%);
+            color: #fff; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .box { 
+            background: #1e1e24; 
+            padding: 40px; 
+            border-radius: 16px; 
+            max-width: 480px; 
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid #2a2a35;
+        }
+        h1 { 
+            color: #4a90e2; 
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+        button { 
+            background: #4a90e2; 
+            color: #fff; 
+            padding: 14px 24px; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: 600;
+            width: 100%;
+            margin: 8px 0;
+            transition: all 0.2s;
+        }
+        button:hover { 
+            background: #5aa0f2; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74,144,226,0.4);
+        }
+        button.forever { background: #e2a04a; }
+        button.forever:hover { background: #f2b05a; }
+        button.week { background: #4ae27a; }
+        button.week:hover { background: #5af28a; }
+        .key { 
+            background: #0f0f14; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-top: 20px; 
+            font-family: 'Courier New', monospace; 
+            word-break: break-all;
+            border: 1px solid #2a2a35;
+            text-align: center;
+        }
+        .key b {
+            color: #4ae27a;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+        .key .expires {
+            color: #e2a04a;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        .loading { color: #e2a04a; text-align: center; padding: 20px; }
+        .error { color: #ff6b6b; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🐻 Laam Hub 🇻🇳</h1>
+        <p class="subtitle">Chọn loại key bạn muốn lấy</p>
+        
+        <button onclick="getKey(1)">🔑 KEY 1 NGÀY</button>
+        <button class="week" onclick="getKey(7)">📅 KEY 1 TUẦN</button>
+        <button onclick="getKey(30)">📅 KEY 1 THÁNG</button>
+        <button class="forever" onclick="getKey(0)">♾️ KEY VĨNH VIỄN</button>
+        
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        async function getKey(days) {
+            document.getElementById('result').innerHTML = '<div class="loading">⏳ Đang tạo key...</div>';
+            
+            try {
+                const res = await fetch('/api/auto-generate?token=laam-auto-secret-2026&days=' + days);
+                const data = await res.json();
+                
+                if (data.success) {
+                    let html = '<div class="key">🔑 Key của bạn:<br><b>' + data.key + '</b>';
+                    if (data.type === 'forever') {
+                        html += '<div class="expires">♾️ Vĩnh viễn - không hết hạn</div>';
+                    } else {
+                        html += '<div class="expires">⏰ Hết hạn: ' + data.expires + '</div>';
+                    }
+                    html += '</div>';
+                    document.getElementById('result').innerHTML = html;
+                } else {
+                    document.getElementById('result').innerHTML = '<div class="error">❌ ' + data.message + '</div>';
+                }
+            } catch (e) {
+                document.getElementById('result').innerHTML = '<div class="error">❌ Lỗi kết nối server</div>';
+            }
+        }
+    </script>
+</body>
+</html>
+    `);
 });
 
+// ============================================
+// START SERVER
+// ============================================
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server chạy tại port ${PORT}`);
+    console.log(`🐻 Laam Hub Key API chạy port ${PORT}`);
+    console.log(`📋 Có ${Object.keys(VALID_KEYS).length} key trong hệ thống`);
 });
