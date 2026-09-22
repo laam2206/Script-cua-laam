@@ -1,503 +1,219 @@
--- ============================================
--- LAAM HUB 🇻🇳 - LOADER (Get Key + Auto Load Script)
--- ============================================
+const express = require('express');
+const cors = require('cors');
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local LocalPlayer = Players.LocalPlayer
+const app = express();
+const PORT = process.env.PORT || 3000;
 
--- ============================================
--- CẤU HÌNH
--- ============================================
-local CONFIG = {
-    API_URL = "https://script-cua-laam.onrender.com/api/verify",
-    LINK4M_URL = "https://link4m.net/juG2sRa",
-    SCRIPT_URL = "https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt",
+app.use(cors());
+app.use(express.json());
+
+// ====== CẤU HÌNH ======
+const CONFIG = {
+    // Key sống 1 ngày (đổi qua ENV: KEY_EXPIRE_HOURS)
+    KEY_EXPIRE_MS: (parseInt(process.env.KEY_EXPIRE_HOURS) || 24) * 60 * 60 * 1000,
+    // Token sống 5 phút (đổi qua ENV: TOKEN_EXPIRE_MINUTES)
+    TOKEN_EXPIRE_MS: (parseInt(process.env.TOKEN_EXPIRE_MINUTES) || 5) * 60 * 1000,
+    // Link Linkvertise của bạn
+    LINKVERTISE_BASE: process.env.LINKVERTISE_BASE || 'https://linkvertise.com/YOUR_LINK_ID',
+    // Secret riêng của bạn
+    SECRET: process.env.SECRET || 'doi_thanh_secret_rieng_cua_ban'
+};
+
+// ====== LƯU TRỮ (JSON file, thay bằng DB nếu cần bền vững) ======
+const DB_FILE = path.join(__dirname, 'keys.json');
+
+let db = {
+    tokens: {},   // token -> { hwid, expires }
+    keys: {}      // key   -> { hwid, expires }
+};
+
+if (fs.existsSync(DB_FILE)) {
+    try {
+        db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    } catch (e) {
+        console.error('Lỗi đọc DB:', e);
+    }
 }
 
--- ============================================
--- LẤY HWID (CỐ ĐỊNH)
--- ============================================
-local function GetHWID()
-    local userId = tostring(LocalPlayer.UserId)
-    local executorName = "unknown"
-    if identifyexecutor then
-        local ok, name = pcall(identifyexecutor)
-        if ok and name then executorName = name end
-    end
-    return "USER_" .. userId .. "_" .. executorName
-end
+// Debounce ghi file
+let saveTimer = null;
+function saveDB() {
+    if (saveTimer) return;
+    saveTimer = setTimeout(() => {
+        try {
+            fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+        } catch (e) {
+            console.error('Lỗi ghi DB:', e);
+        }
+        saveTimer = null;
+    }, 500);
+}
 
--- ============================================
--- LƯU KEY 3 LỚP
--- ============================================
-local KEY_FILES = {"LaamHub_Key.txt", "LaamHub_SavedKey.txt", "laam_key.dat"}
+// ====== TIỆN ÍCH ======
+function randomHex(bytes = 16) {
+    return crypto.randomBytes(bytes).toString('hex');
+}
 
-local function SaveKey(key)
-    getgenv().LaamHub_Key = key
-    if writefile then
-        for _, file in ipairs(KEY_FILES) do
-            pcall(writefile, file, key)
-        end
-    end
-end
+function generateKey(hwid) {
+    const rand = randomHex(16);
+    const sig = crypto
+        .createHmac('sha256', CONFIG.SECRET)
+        .update(hwid + Date.now() + rand)
+        .digest('hex')
+        .slice(0, 12);
+    return `${rand}-${sig}`;
+}
 
-local function ReadSavedKey()
-    if getgenv().LaamHub_Key and getgenv().LaamHub_Key ~= "" then
-        return getgenv().LaamHub_Key
-    end
-    if isfile and readfile then
-        for _, file in ipairs(KEY_FILES) do
-            local ok, exists = pcall(isfile, file)
-            if ok and exists then
-                local ok2, content = pcall(readfile, file)
-                if ok2 and content and content ~= "" then
-                    getgenv().LaamHub_Key = content
-                    return content
-                end
-            end
-        end
-    end
-    return nil
-end
+function formatDuration(ms) {
+    const h = Math.floor(ms / (60 * 60 * 1000));
+    const m = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
+    if (h >= 24) {
+        const d = Math.floor(h / 24);
+        const rh = h % 24;
+        return rh > 0 ? `${d} ngày ${rh} giờ` : `${d} ngày`;
+    }
+    if (h > 0) return m > 0 ? `${h} giờ ${m} phút` : `${h} giờ`;
+    return `${m} phút`;
+}
 
-local function DeleteSavedKey()
-    getgenv().LaamHub_Key = nil
-    if delfile then
-        for _, file in ipairs(KEY_FILES) do
-            pcall(delfile, file)
-        end
-    end
-end
+function cleanupExpired() {
+    const now = Date.now();
+    let changed = false;
 
--- ============================================
--- XÁC THỰC KEY QUA API
--- ============================================
-local function VerifyKeyOnline(inputKey)
-    local hwid = GetHWID()
-    local payload = HttpService:JSONEncode({
-        key = inputKey,
-        hwid = hwid,
-        username = LocalPlayer.Name,
-    })
-    
-    local responseBody = nil
-    
-    if request then
-        local ok, response = pcall(function()
-            return request({
-                Url = CONFIG.API_URL,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = payload,
-            })
-        end)
-        if ok and response then responseBody = response.Body or response end
-    end
-    
-    if not responseBody and syn and syn.request then
-        local ok, response = pcall(function()
-            return syn.request({
-                Url = CONFIG.API_URL,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = payload,
-            })
-        end)
-        if ok and response then responseBody = response.Body or response end
-    end
-    
-    if not responseBody and http_request then
-        local ok, response = pcall(function()
-            return http_request({
-                Url = CONFIG.API_URL,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = payload,
-            })
-        end)
-        if ok and response then responseBody = response.Body or response end
-    end
-    
-    if not responseBody then
-        local ok, response = pcall(function()
-            return HttpService:PostAsync(CONFIG.API_URL, payload, Enum.HttpContentType.ApplicationJson)
-        end)
-        if ok then responseBody = response end
-    end
-    
-    if not responseBody then
-        return false, "Không kết nối được server!"
-    end
-    
-    local ok, data = pcall(HttpService.JSONDecode, HttpService, responseBody)
-    if not ok then
-        return false, "Server trả về lỗi!"
-    end
-    
-    return data.valid, data.message
-end
+    for (const t in db.tokens) {
+        if (db.tokens[t].expires < now) {
+            delete db.tokens[t];
+            changed = true;
+        }
+    }
+    for (const k in db.keys) {
+        if (db.keys[k].expires < now) {
+            delete db.keys[k];
+            changed = true;
+        }
+    }
+    if (changed) saveDB();
+}
+setInterval(cleanupExpired, 60 * 1000); // Dọn mỗi phút
 
--- ============================================
--- LOAD SCRIPT CHÍNH KHI KEY ĐÚNG
--- ============================================
-local function TryOpenMenu()
-    local ok, err = pcall(function()
-        loadstring(game:HttpGet(CONFIG.SCRIPT_URL))()
-    end)
-    
-    if not ok then
-        warn("Lỗi load script chính: " .. tostring(err))
-        return false
-    end
-    
-    return true
-end
+// ====== ROUTES ======
 
--- ============================================
--- GIAO DIỆN GET KEY
--- ============================================
-local KeyGui = Instance.new("ScreenGui")
-KeyGui.Name = "LaamHubKeySystem"
-KeyGui.ResetOnSpawn = false
-KeyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-KeyGui.Parent = game.CoreGui
+// Health check (Render ping)
+app.get('/', (req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'Key System API',
+        keyExpire: formatDuration(CONFIG.KEY_EXPIRE_MS),
+        tokenExpire: formatDuration(CONFIG.TOKEN_EXPIRE_MS)
+    });
+});
 
--- Backdrop
-local Backdrop = Instance.new("Frame")
-Backdrop.Size = UDim2.new(1, 0, 1, 0)
-Backdrop.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Backdrop.BackgroundTransparency = 0.5
-Backdrop.BorderSizePixel = 0
-Backdrop.ZIndex = 1
-Backdrop.Parent = KeyGui
+// 1. Client yêu cầu link vượt
+app.post('/api/request-key', (req, res) => {
+    const { hwid } = req.body;
+    if (!hwid) return res.status(400).json({ error: 'Thiếu hwid' });
 
--- Khung chính
-local KeyFrame = Instance.new("Frame")
-KeyFrame.Size = UDim2.new(0, 460, 0, 430)
-KeyFrame.Position = UDim2.new(0.5, -230, 0.5, -215)
-KeyFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-KeyFrame.BorderSizePixel = 0
-KeyFrame.Active = true
-KeyFrame.Draggable = true
-KeyFrame.ZIndex = 2
-KeyFrame.Parent = KeyGui
+    const token = randomHex(8);
+    db.tokens[token] = {
+        hwid,
+        expires: Date.now() + CONFIG.TOKEN_EXPIRE_MS
+    };
+    saveDB();
 
-local KeyCorner = Instance.new("UICorner")
-KeyCorner.CornerRadius = UDim.new(0, 16)
-KeyCorner.Parent = KeyFrame
+    const link = `${CONFIG.LINKVERTISE_BASE}?token=${token}`;
+    res.json({ link, token });
+});
 
-local Gradient = Instance.new("UIGradient")
-Gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 30)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 15, 20)),
-})
-Gradient.Rotation = 45
-Gradient.Parent = KeyFrame
+// 2. Callback sau khi vượt link
+app.get('/api/callback', (req, res) => {
+    const { token } = req.query;
+    if (!token) return res.status(400).send('Thiếu token');
 
-local KeyStroke = Instance.new("UIStroke")
-KeyStroke.Color = Color3.fromRGB(218, 37, 29)
-KeyStroke.Thickness = 2
-KeyStroke.Transparency = 0.2
-KeyStroke.Parent = KeyFrame
+    const entry = db.tokens[token];
+    if (!entry || entry.expires < Date.now()) {
+        return res.status(400).send('Token không hợp lệ hoặc đã hết hạn');
+    }
 
-task.spawn(function()
-    while KeyFrame.Parent do
-        TweenService:Create(KeyStroke, TweenInfo.new(1.5), {Transparency = 0.7}):Play()
-        task.wait(1.5)
-        TweenService:Create(KeyStroke, TweenInfo.new(1.5), {Transparency = 0.2}):Play()
-        task.wait(1.5)
-    end
-end)
+    const key = generateKey(entry.hwid);
+    db.keys[key] = {
+        hwid: entry.hwid,
+        expires: Date.now() + CONFIG.KEY_EXPIRE_MS
+    };
+    delete db.tokens[token];
+    saveDB();
 
--- Logo cờ VN
-local LogoFrame = Instance.new("Frame")
-LogoFrame.Size = UDim2.new(0, 80, 0, 80)
-LogoFrame.Position = UDim2.new(0.5, -40, 0, 20)
-LogoFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-LogoFrame.BorderSizePixel = 0
-LogoFrame.ZIndex = 3
-LogoFrame.Parent = KeyFrame
+    const durationText = formatDuration(CONFIG.KEY_EXPIRE_MS);
 
-local LogoCorner = Instance.new("UICorner")
-LogoCorner.CornerRadius = UDim.new(1, 0)
-LogoCorner.Parent = LogoFrame
+    res.send(`
+        <html>
+        <head>
+            <title>Key của bạn</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body style="font-family:sans-serif;text-align:center;padding:50px;background:#111;color:#0f0;margin:0;">
+            <h2>Key của bạn đã sẵn sàng</h2>
+            <p style="font-size:20px;background:#222;padding:20px;border-radius:8px;display:inline-block;word-break:break-all;max-width:90%;">
+                ${key}
+            </p>
+            <p style="color:#888;font-size:12px;">Key có hiệu lực ${durationText}. Copy và dán vào script.</p>
+            <button onclick="navigator.clipboard.writeText('${key}');this.innerText='Đã copy ✓'"
+                style="margin-top:16px;padding:10px 24px;font-size:14px;border:none;border-radius:6px;background:#0f0;color:#000;cursor:pointer;font-weight:bold;">
+                Copy Key
+            </button>
+        </body>
+        </html>
+    `);
+});
 
-local LogoStroke = Instance.new("UIStroke")
-LogoStroke.Color = Color3.fromRGB(218, 37, 29)
-LogoStroke.Thickness = 2
-LogoStroke.Parent = LogoFrame
+// 3. Client kiểm tra key
+app.post('/api/check-key', (req, res) => {
+    const { key, hwid } = req.body;
+    if (!key || !hwid) {
+        return res.status(400).json({ valid: false, error: 'Thiếu key hoặc hwid' });
+    }
 
-local LogoText = Instance.new("TextLabel")
-LogoText.Size = UDim2.new(1, 0, 1, 0)
-LogoText.BackgroundTransparency = 1
-LogoText.Text = "🇻🇳"
-LogoText.TextSize = 50
-LogoText.Font = Enum.Font.GothamBold
-LogoText.ZIndex = 4
-LogoText.Parent = LogoFrame
+    const entry = db.keys[key];
+    if (!entry) return res.json({ valid: false, reason: 'Key không tồn tại' });
 
--- Tiêu đề
-local KeyTitle = Instance.new("TextLabel")
-KeyTitle.Size = UDim2.new(1, 0, 0, 30)
-KeyTitle.Position = UDim2.new(0, 0, 0, 110)
-KeyTitle.BackgroundTransparency = 1
-KeyTitle.Text = "LAAM HUB"
-KeyTitle.TextColor3 = Color3.fromRGB(255, 205, 0)
-KeyTitle.TextSize = 24
-KeyTitle.Font = Enum.Font.GothamBold
-KeyTitle.ZIndex = 3
-KeyTitle.Parent = KeyFrame
+    if (entry.expires < Date.now()) {
+        delete db.keys[key];
+        saveDB();
+        return res.json({ valid: false, reason: 'Key đã hết hạn' });
+    }
 
--- Phụ đề
-local KeySubTitle = Instance.new("TextLabel")
-KeySubTitle.Size = UDim2.new(1, 0, 0, 20)
-KeySubTitle.Position = UDim2.new(0, 0, 0, 140)
-KeySubTitle.BackgroundTransparency = 1
-KeySubTitle.Text = "Nhập key để sử dụng script"
-KeySubTitle.TextColor3 = Color3.fromRGB(140, 140, 150)
-KeySubTitle.TextSize = 12
-KeySubTitle.Font = Enum.Font.Gotham
-KeySubTitle.ZIndex = 3
-KeySubTitle.Parent = KeyFrame
+    if (entry.hwid !== hwid) {
+        return res.json({ valid: false, reason: 'Key không khớp HWID' });
+    }
 
--- Ô nhập key
-local KeyInput = Instance.new("TextBox")
-KeyInput.Size = UDim2.new(1, -50, 0, 48)
-KeyInput.Position = UDim2.new(0, 25, 0, 175)
-KeyInput.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
-KeyInput.BorderSizePixel = 0
-KeyInput.Text = ""
-KeyInput.PlaceholderText = "Nhập key tại đây..."
-KeyInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 110)
-KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyInput.TextSize = 13
-KeyInput.Font = Enum.Font.Gotham
-KeyInput.ClearTextOnFocus = false
-KeyInput.ZIndex = 3
-KeyInput.Parent = KeyFrame
+    const remaining = entry.expires - Date.now();
+    res.json({
+        valid: true,
+        expires: entry.expires,
+        remaining: formatDuration(remaining)
+    });
+});
 
-local KeyInputCorner = Instance.new("UICorner")
-KeyInputCorner.CornerRadius = UDim.new(0, 10)
-KeyInputCorner.Parent = KeyInput
+// 4. Admin tạo key thủ công
+app.post('/api/admin/generate', (req, res) => {
+    const { hwid, secret } = req.body;
+    if (secret !== CONFIG.SECRET) {
+        return res.status(403).json({ error: 'Sai secret' });
+    }
+    const key = generateKey(hwid || 'manual');
+    db.keys[key] = {
+        hwid: hwid || 'manual',
+        expires: Date.now() + CONFIG.KEY_EXPIRE_MS
+    };
+    saveDB();
+    res.json({ key, expires: db.keys[key].expires });
+});
 
-local KeyInputStroke = Instance.new("UIStroke")
-KeyInputStroke.Color = Color3.fromRGB(60, 60, 70)
-KeyInputStroke.Thickness = 1
-KeyInputStroke.Parent = KeyInput
-
-KeyInput.Focused:Connect(function()
-    TweenService:Create(KeyInputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(218, 37, 29)}):Play()
-end)
-KeyInput.FocusLost:Connect(function()
-    TweenService:Create(KeyInputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(60, 60, 70)}):Play()
-end)
-
--- Nút XÁC NHẬN
-local KeyBtn = Instance.new("TextButton")
-KeyBtn.Size = UDim2.new(1, -50, 0, 46)
-KeyBtn.Position = UDim2.new(0, 25, 0, 235)
-KeyBtn.BackgroundColor3 = Color3.fromRGB(218, 37, 29)
-KeyBtn.Text = "XÁC NHẬN KEY"
-KeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyBtn.TextSize = 14
-KeyBtn.Font = Enum.Font.GothamBold
-KeyBtn.BorderSizePixel = 0
-KeyBtn.AutoButtonColor = false
-KeyBtn.ZIndex = 3
-KeyBtn.Parent = KeyFrame
-
-local KeyBtnCorner = Instance.new("UICorner")
-KeyBtnCorner.CornerRadius = UDim.new(0, 10)
-KeyBtnCorner.Parent = KeyBtn
-
-local KeyBtnGradient = Instance.new("UIGradient")
-KeyBtnGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(218, 37, 29)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 80)),
-})
-KeyBtnGradient.Rotation = 45
-KeyBtnGradient.Parent = KeyBtn
-
--- Nút LẤY KEY
-local GetKeyBtn = Instance.new("TextButton")
-GetKeyBtn.Size = UDim2.new(1, -50, 0, 46)
-GetKeyBtn.Position = UDim2.new(0, 25, 0, 290)
-GetKeyBtn.BackgroundColor3 = Color3.fromRGB(255, 205, 0)
-GetKeyBtn.Text = "LẤY KEY MIỄN PHÍ"
-GetKeyBtn.TextColor3 = Color3.fromRGB(30, 30, 30)
-GetKeyBtn.TextSize = 14
-GetKeyBtn.Font = Enum.Font.GothamBold
-GetKeyBtn.BorderSizePixel = 0
-GetKeyBtn.AutoButtonColor = false
-GetKeyBtn.ZIndex = 3
-GetKeyBtn.Parent = KeyFrame
-
-local GetKeyBtnCorner = Instance.new("UICorner")
-GetKeyBtnCorner.CornerRadius = UDim.new(0, 10)
-GetKeyBtnCorner.Parent = GetKeyBtn
-
-local GetKeyBtnGradient = Instance.new("UIGradient")
-GetKeyBtnGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 205, 0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 150, 0)),
-})
-GetKeyBtnGradient.Rotation = 45
-GetKeyBtnGradient.Parent = GetKeyBtn
-
--- Trạng thái
-local StatusFrame = Instance.new("Frame")
-StatusFrame.Size = UDim2.new(1, -50, 0, 45)
-StatusFrame.Position = UDim2.new(0, 25, 0, 345)
-StatusFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
-StatusFrame.BorderSizePixel = 0
-StatusFrame.ZIndex = 3
-StatusFrame.Parent = KeyFrame
-
-local StatusCorner = Instance.new("UICorner")
-StatusCorner.CornerRadius = UDim.new(0, 8)
-StatusCorner.Parent = StatusFrame
-
-local KeyStatus = Instance.new("TextLabel")
-KeyStatus.Size = UDim2.new(1, -10, 1, 0)
-KeyStatus.Position = UDim2.new(0, 5, 0, 0)
-KeyStatus.BackgroundTransparency = 1
-KeyStatus.Text = "Vui lòng nhập key hoặc lấy key mới"
-KeyStatus.TextColor3 = Color3.fromRGB(180, 180, 190)
-KeyStatus.TextSize = 11
-KeyStatus.Font = Enum.Font.Gotham
-KeyStatus.TextWrapped = true
-KeyStatus.ZIndex = 4
-KeyStatus.Parent = StatusFrame
-
--- Nút Copy HWID
-local HWIDBtn = Instance.new("TextButton")
-HWIDBtn.Size = UDim2.new(0, 120, 0, 26)
-HWIDBtn.Position = UDim2.new(0.5, -60, 1, -32)
-HWIDBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-HWIDBtn.Text = "Copy HWID"
-HWIDBtn.TextColor3 = Color3.fromRGB(180, 180, 190)
-HWIDBtn.TextSize = 11
-HWIDBtn.Font = Enum.Font.Gotham
-HWIDBtn.BorderSizePixel = 0
-HWIDBtn.AutoButtonColor = false
-HWIDBtn.ZIndex = 3
-HWIDBtn.Parent = KeyFrame
-
-local HWIDBtnCorner = Instance.new("UICorner")
-HWIDBtnCorner.CornerRadius = UDim.new(0, 6)
-HWIDBtnCorner.Parent = HWIDBtn
-
--- ============================================
--- SỰ KIỆN
--- ============================================
-
-KeyBtn.MouseEnter:Connect(function()
-    TweenService:Create(KeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 60, 50)}):Play()
-end)
-KeyBtn.MouseLeave:Connect(function()
-    TweenService:Create(KeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(218, 37, 29)}):Play()
-end)
-
-GetKeyBtn.MouseEnter:Connect(function()
-    TweenService:Create(GetKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 230, 80)}):Play()
-end)
-GetKeyBtn.MouseLeave:Connect(function()
-    TweenService:Create(GetKeyBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 205, 0)}):Play()
-end)
-
--- Click LẤY KEY
-GetKeyBtn.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(CONFIG.LINK4M_URL)
-    end
-    KeyStatus.Text = "Đã copy link! Mở trình duyệt dán link để lấy key."
-    KeyStatus.TextColor3 = Color3.fromRGB(120, 180, 255)
-    
-    pcall(function()
-        game:GetService("GuiService"):OpenBrowserWindow(CONFIG.LINK4M_URL)
-    end)
-end)
-
--- Click XÁC NHẬN
-KeyBtn.MouseButton1Click:Connect(function()
-    local input = KeyInput.Text
-    if input == "" then
-        KeyStatus.Text = "Vui lòng nhập key!"
-        KeyStatus.TextColor3 = Color3.fromRGB(255, 200, 100)
-        return
-    end
-    
-    KeyStatus.Text = "Đang xác thực..."
-    KeyStatus.TextColor3 = Color3.fromRGB(255, 255, 150)
-    
-    local valid, message = VerifyKeyOnline(input)
-    
-    if valid then
-        KeyStatus.Text = message
-        KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
-        SaveKey(input)
-        
-        task.wait(1)
-        
-        -- Đóng GUI key
-        KeyGui:Destroy()
-        
-        -- Load script chính
-        TryOpenMenu()
-    else
-        KeyStatus.Text = message
-        KeyStatus.TextColor3 = Color3.fromRGB(255, 120, 120)
-        
-        local originalPos = KeyFrame.Position
-        for i = 1, 3 do
-            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
-                Position = originalPos + UDim2.new(0, 10, 0, 0)
-            }):Play()
-            task.wait(0.05)
-            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
-                Position = originalPos - UDim2.new(0, 10, 0, 0)
-            }):Play()
-            task.wait(0.05)
-        end
-        TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
-            Position = originalPos
-        }):Play()
-    end
-end)
-
--- Click COPY HWID
-HWIDBtn.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(GetHWID())
-        KeyStatus.Text = "Đã copy HWID!"
-        KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
-    end
-end)
-
--- ============================================
--- TỰ ĐỘNG ĐỌC KEY ĐÃ LƯU
--- ============================================
-task.spawn(function()
-    local saved = ReadSavedKey()
-    if saved and saved ~= "" then
-        KeyStatus.Text = "Đang kiểm tra key đã lưu..."
-        KeyStatus.TextColor3 = Color3.fromRGB(180, 180, 190)
-        KeyInput.Text = saved
-        
-        local valid, message = VerifyKeyOnline(saved)
-        if valid then
-            KeyStatus.Text = "Key hợp lệ! Đang vào menu..."
-            KeyStatus.TextColor3 = Color3.fromRGB(150, 255, 150)
-            task.wait(1)
-            
-            KeyGui:Destroy()
-            TryOpenMenu()
-        else
-            DeleteSavedKey()
-            KeyStatus.Text = message .. " Vui lòng lấy key mới!"
-            KeyStatus.TextColor3 = Color3.fromRGB(255, 200, 100)
-        end
-    end
-end)
+// ====== START ======
+app.listen(PORT, () => {
+    console.log(`✅ Key API đang chạy tại port ${PORT}`);
+    console.log(`   Key sống: ${formatDuration(CONFIG.KEY_EXPIRE_MS)}`);
+    console.log(`   Token sống: ${formatDuration(CONFIG.TOKEN_EXPIRE_MS)}`);
+});
