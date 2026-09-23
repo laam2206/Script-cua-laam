@@ -7,14 +7,12 @@ local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 
-local LocalPlayer = Players.LocalPlayer
+local player = Players.LocalPlayer
 
 --// ⚙️ CẤU HÌNH
 local API_URL = "https://script.google.com/macros/s/AKfycbwKwWsp21xs5_xu93AkxQ9Tzy0jDyTgjYP8bhQY2eiv5fA9crZzlwVfDEpQ7vSbDraqMA/exec"
 local SECRET = "LAMHUB_SECRET_2025"
 local GETKEY_LINK = "https://link4m.org/eVKbrJ"
-
---// 🌟 LINK MENU CHÍNH
 local MENU_SCRIPT = "https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt"
 
 --// 🛠️ HWID
@@ -25,11 +23,11 @@ local function getHWID()
         elseif syn and syn.get_hwid then hwid = syn.get_hwid()
         end
     end)
-    if not hwid then hwid = tostring(LocalPlayer.UserId) .. "_" .. LocalPlayer.Name end
+    if not hwid then hwid = tostring(player.UserId) .. "_" .. player.Name end
     return hwid
 end
 
---// 🌐 GỌI API
+--// 🌐 API
 local function callAPI(action, key)
     local url = API_URL .. "?action=" .. action
         .. "&key=" .. (key or "")
@@ -52,21 +50,19 @@ local function callAPI(action, key)
     return { success = false, message = "❌ Lỗi server!" }
 end
 
---// 💾 LƯU KEY
-local SAVE_FILE = "LamHub_Key.json"
-
+--// 💾 SAVE KEY
 local function saveKey(k)
     pcall(function()
         if writefile then
-            writefile(SAVE_FILE, HttpService:JSONEncode({ key = k }))
+            writefile("LamHub_Key.json", HttpService:JSONEncode({key = k}))
         end
     end)
 end
 
 local function loadSaved()
     local ok, d = pcall(function()
-        if readfile and isfile and isfile(SAVE_FILE) then
-            return HttpService:JSONDecode(readfile(SAVE_FILE))
+        if readfile and isfile and isfile("LamHub_Key.json") then
+            return HttpService:JSONDecode(readfile("LamHub_Key.json"))
         end
     end)
     if ok and d and d.key then return d.key end
@@ -75,202 +71,259 @@ end
 
 local function clearSaved()
     pcall(function()
-        if delfile and isfile and isfile(SAVE_FILE) then delfile(SAVE_FILE) end
+        if delfile and isfile and isfile("LamHub_Key.json") then
+            delfile("LamHub_Key.json")
+        end
     end)
 end
 
 --// 🧹 XÓA UI CŨ
 pcall(function()
-    if CoreGui:FindFirstChild("LaamHubKeyUI") then CoreGui.LaamHubKeyUI:Destroy() end
+    if CoreGui:FindFirstChild("LaamHubKeyUI") then
+        CoreGui.LaamHubKeyUI:Destroy()
+    end
 end)
 
---// 🎨 SCREEN GUI
+--// 🎨 UI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "LaamHubKeyUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = CoreGui
 
---// ============================================
---// 🎨 UI GET KEY
---// ============================================
+-- 🌟 TĂNG CHIỀU CAO ĐỂ CHỨA THÊM DÒNG BÁN KEY
 local KeyFrame = Instance.new("Frame")
-KeyFrame.Size = UDim2.new(0, 440, 0, 340)
-KeyFrame.Position = UDim2.new(0.5, -220, 0.5, -170)
+KeyFrame.Size = UDim2.new(0, 320, 0, 330)
+KeyFrame.Position = UDim2.new(0.5, -160, 0.5, -165)
 KeyFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
 KeyFrame.BorderSizePixel = 0
 KeyFrame.Active = true
 KeyFrame.Draggable = true
 KeyFrame.Parent = ScreenGui
-Instance.new("UICorner", KeyFrame).CornerRadius = UDim.new(0, 16)
+Instance.new("UICorner", KeyFrame).CornerRadius = UDim.new(0, 14)
 
-local KeyStroke = Instance.new("UIStroke")
-KeyStroke.Color = Color3.fromRGB(220, 30, 30)
-KeyStroke.Thickness = 2
-KeyStroke.Parent = KeyFrame
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(220, 30, 30)
+Stroke.Thickness = 1.5
+Stroke.Parent = KeyFrame
 
 -- Title
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -100, 0, 45)
-Title.Position = UDim2.new(0, 15, 0, 10)
+Title.Size = UDim2.new(1, -60, 0, 30)
+Title.Position = UDim2.new(0, 12, 0, 8)
 Title.BackgroundTransparency = 1
-Title.Text = "🇻🇳 LAAM HUB 🇻🇳"
+Title.Text = "🇻🇳 LAAM HUB"
 Title.TextColor3 = Color3.fromRGB(255, 80, 80)
-Title.TextSize = 24
+Title.TextSize = 16
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = KeyFrame
 
--- Subtitle
-local Subtitle = Instance.new("TextLabel")
-Subtitle.Size = UDim2.new(1, 0, 0, 18)
-Subtitle.Position = UDim2.new(0, 0, 0, 52)
-Subtitle.BackgroundTransparency = 1
-Subtitle.Text = "🔐 Nhập key để sử dụng menu"
-Subtitle.TextColor3 = Color3.fromRGB(160, 160, 180)
-Subtitle.TextSize = 12
-Subtitle.Font = Enum.Font.Gotham
-Subtitle.Parent = KeyFrame
-
 -- Close
 local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(0, 32, 0, 32)
-CloseBtn.Position = UDim2.new(1, -42, 0, 12)
+CloseBtn.Size = UDim2.new(0, 24, 0, 24)
+CloseBtn.Position = UDim2.new(1, -30, 0, 8)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
 CloseBtn.Text = "✕"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextSize = 16
+CloseBtn.TextSize = 12
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.Parent = KeyFrame
-Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
 CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
+-- Subtitle
+local Sub = Instance.new("TextLabel")
+Sub.Size = UDim2.new(1, 0, 0, 14)
+Sub.Position = UDim2.new(0, 0, 0, 36)
+Sub.BackgroundTransparency = 1
+Sub.Text = "🔐 Nhập key để sử dụng"
+Sub.TextColor3 = Color3.fromRGB(140, 140, 160)
+Sub.TextSize = 10
+Sub.Font = Enum.Font.Gotham
+Sub.Parent = KeyFrame
+
 -- HWID
-local HWIDLabel = Instance.new("TextLabel")
-HWIDLabel.Size = UDim2.new(0.9, 0, 0, 15)
-HWIDLabel.Position = UDim2.new(0.05, 0, 0, 75)
-HWIDLabel.BackgroundTransparency = 1
-HWIDLabel.Text = "🖥️ HWID: " .. string.sub(getHWID(), 1, 32) .. "..."
-HWIDLabel.TextColor3 = Color3.fromRGB(100, 100, 120)
-HWIDLabel.TextSize = 10
-HWIDLabel.Font = Enum.Font.Code
-HWIDLabel.TextXAlignment = Enum.TextXAlignment.Left
-HWIDLabel.Parent = KeyFrame
+local HWID = Instance.new("TextLabel")
+HWID.Size = UDim2.new(0.9, 0, 0, 12)
+HWID.Position = UDim2.new(0.05, 0, 0, 55)
+HWID.BackgroundTransparency = 1
+HWID.Text = "🖥️ " .. string.sub(getHWID(), 1, 28) .. "..."
+HWID.TextColor3 = Color3.fromRGB(80, 80, 100)
+HWID.TextSize = 8
+HWID.Font = Enum.Font.Code
+HWID.TextXAlignment = Enum.TextXAlignment.Left
+HWID.Parent = KeyFrame
 
 -- TextBox
 local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(0.9, 0, 0, 42)
-TextBox.Position = UDim2.new(0.05, 0, 0, 98)
+TextBox.Size = UDim2.new(0.9, 0, 0, 34)
+TextBox.Position = UDim2.new(0.05, 0, 0, 72)
 TextBox.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
 TextBox.BorderSizePixel = 0
 TextBox.Text = ""
 TextBox.PlaceholderText = "Dán key vào đây..."
 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextBox.PlaceholderColor3 = Color3.fromRGB(110, 110, 130)
-TextBox.TextSize = 14
+TextBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 120)
+TextBox.TextSize = 12
 TextBox.Font = Enum.Font.Gotham
 TextBox.ClearTextOnFocus = false
 TextBox.Parent = KeyFrame
-Instance.new("UICorner", TextBox).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", TextBox).CornerRadius = UDim.new(0, 8)
 
 -- Submit
 local SubmitBtn = Instance.new("TextButton")
-SubmitBtn.Size = UDim2.new(0.9, 0, 0, 42)
-SubmitBtn.Position = UDim2.new(0.05, 0, 0, 148)
+SubmitBtn.Size = UDim2.new(0.9, 0, 0, 34)
+SubmitBtn.Position = UDim2.new(0.05, 0, 0, 114)
 SubmitBtn.BackgroundColor3 = Color3.fromRGB(220, 30, 30)
-SubmitBtn.Text = "🔓 XÁC NHẬN KEY"
+SubmitBtn.Text = "🔓 XÁC NHẬN"
 SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SubmitBtn.TextSize = 15
+SubmitBtn.TextSize = 13
 SubmitBtn.Font = Enum.Font.GothamBold
 SubmitBtn.Parent = KeyFrame
-Instance.new("UICorner", SubmitBtn).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", SubmitBtn).CornerRadius = UDim.new(0, 8)
 
 SubmitBtn.MouseEnter:Connect(function()
-    TweenService:Create(SubmitBtn, TweenInfo.new(0.15), {
-        BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-    }):Play()
+    TweenService:Create(SubmitBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 60, 60)}):Play()
 end)
 SubmitBtn.MouseLeave:Connect(function()
-    TweenService:Create(SubmitBtn, TweenInfo.new(0.15), {
-        BackgroundColor3 = Color3.fromRGB(220, 30, 30)
-    }):Play()
+    TweenService:Create(SubmitBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(220, 30, 30)}):Play()
 end)
 
--- Get Key button
+-- Get Key
 local GetKeyBtn = Instance.new("TextButton")
-GetKeyBtn.Size = UDim2.new(0.9, 0, 0, 42)
-GetKeyBtn.Position = UDim2.new(0.05, 0, 0, 198)
+GetKeyBtn.Size = UDim2.new(0.9, 0, 0, 34)
+GetKeyBtn.Position = UDim2.new(0.05, 0, 0, 156)
 GetKeyBtn.BackgroundColor3 = Color3.fromRGB(30, 25, 40)
-GetKeyBtn.Text = "🔗 GET KEY (MIỄN PHÍ)"
+GetKeyBtn.Text = "🔗 GET KEY"
 GetKeyBtn.TextColor3 = Color3.fromRGB(255, 120, 120)
-GetKeyBtn.TextSize = 15
+GetKeyBtn.TextSize = 13
 GetKeyBtn.Font = Enum.Font.GothamBold
 GetKeyBtn.Parent = KeyFrame
-Instance.new("UICorner", GetKeyBtn).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", GetKeyBtn).CornerRadius = UDim.new(0, 8)
 
 local GKStroke = Instance.new("UIStroke")
 GKStroke.Color = Color3.fromRGB(220, 30, 30)
-GKStroke.Thickness = 1.5
+GKStroke.Thickness = 1
 GKStroke.Parent = GetKeyBtn
 
 GetKeyBtn.MouseEnter:Connect(function()
-    TweenService:Create(GetKeyBtn, TweenInfo.new(0.15), {
-        BackgroundColor3 = Color3.fromRGB(50, 30, 40)
-    }):Play()
+    TweenService:Create(GetKeyBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(50, 30, 40)}):Play()
 end)
 GetKeyBtn.MouseLeave:Connect(function()
-    TweenService:Create(GetKeyBtn, TweenInfo.new(0.15), {
-        BackgroundColor3 = Color3.fromRGB(30, 25, 40)
-    }):Play()
+    TweenService:Create(GetKeyBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(30, 25, 40)}):Play()
 end)
 
 -- Status
-local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(1, 0, 0, 20)
-StatusLabel.Position = UDim2.new(0, 0, 0, 248)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = ""
-StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-StatusLabel.TextSize = 13
-StatusLabel.Font = Enum.Font.Gotham
-StatusLabel.Parent = KeyFrame
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, 0, 0, 16)
+Status.Position = UDim2.new(0, 0, 0, 196)
+Status.BackgroundTransparency = 1
+Status.Text = ""
+Status.TextColor3 = Color3.fromRGB(255, 80, 80)
+Status.TextSize = 10
+Status.Font = Enum.Font.Gotham
+Status.Parent = KeyFrame
 
--- Time display
+-- Time Box
 local TimeBox = Instance.new("Frame")
-TimeBox.Size = UDim2.new(0.9, 0, 0, 42)
-TimeBox.Position = UDim2.new(0.05, 0, 0, 273)
+TimeBox.Size = UDim2.new(0.9, 0, 0, 32)
+TimeBox.Position = UDim2.new(0.05, 0, 0, 214)
 TimeBox.BackgroundColor3 = Color3.fromRGB(28, 20, 25)
 TimeBox.BorderSizePixel = 0
 TimeBox.Visible = false
 TimeBox.Parent = KeyFrame
-Instance.new("UICorner", TimeBox).CornerRadius = UDim.new(0, 10)
+Instance.new("UICorner", TimeBox).CornerRadius = UDim.new(0, 8)
 
 local TBStroke = Instance.new("UIStroke")
 TBStroke.Color = Color3.fromRGB(220, 60, 60)
-TBStroke.Thickness = 1.5
+TBStroke.Thickness = 1
 TBStroke.Parent = TimeBox
 
 local TimeLabel = Instance.new("TextLabel")
-TimeLabel.Size = UDim2.new(1, -20, 1, 0)
-TimeLabel.Position = UDim2.new(0, 10, 0, 0)
+TimeLabel.Size = UDim2.new(1, -16, 1, 0)
+TimeLabel.Position = UDim2.new(0, 8, 0, 0)
 TimeLabel.BackgroundTransparency = 1
-TimeLabel.Text = "⏰ Còn lại: --"
+TimeLabel.Text = "⏰ --"
 TimeLabel.TextColor3 = Color3.fromRGB(255, 180, 180)
-TimeLabel.TextSize = 14
+TimeLabel.TextSize = 11
 TimeLabel.Font = Enum.Font.GothamBold
 TimeLabel.TextXAlignment = Enum.TextXAlignment.Left
 TimeLabel.Parent = TimeBox
 
+-- 🌟 DÒNG BÁN KEY (MỚI THÊM)
+local SellBox = Instance.new("Frame")
+SellBox.Size = UDim2.new(0.9, 0, 0, 52)
+SellBox.Position = UDim2.new(0.05, 0, 0, 252)
+SellBox.BackgroundColor3 = Color3.fromRGB(35, 25, 15)
+SellBox.BorderSizePixel = 0
+SellBox.Parent = KeyFrame
+Instance.new("UICorner", SellBox).CornerRadius = UDim.new(0, 8)
+
+local SellStroke = Instance.new("UIStroke")
+SellStroke.Color = Color3.fromRGB(255, 180, 60)
+SellStroke.Thickness = 1.2
+SellStroke.Parent = SellBox
+
+-- Dòng 1: Bán key
+local SellText1 = Instance.new("TextLabel")
+SellText1.Size = UDim2.new(1, -12, 0, 22)
+SellText1.Position = UDim2.new(0, 6, 0, 4)
+SellText1.BackgroundTransparency = 1
+SellText1.Text = "💰 Bán key: 1 tuần • 1 tháng • 1 năm • Vĩnh viễn"
+SellText1.TextColor3 = Color3.fromRGB(255, 200, 87)
+SellText1.TextSize = 9
+SellText1.Font = Enum.Font.GothamBold
+SellText1.TextXAlignment = Enum.TextXAlignment.Left
+SellText1.TextWrapped = true
+SellText1.Parent = SellBox
+
+-- Dòng 2: Zalo
+local SellText2 = Instance.new("TextLabel")
+SellText2.Size = UDim2.new(1, -12, 0, 22)
+SellText2.Position = UDim2.new(0, 6, 0, 26)
+SellText2.BackgroundTransparency = 1
+SellText2.Text = "📞 Ai cần IB Zalo: 0942062013"
+SellText2.TextColor3 = Color3.fromRGB(80, 255, 120)
+SellText2.TextSize = 10
+SellText2.Font = Enum.Font.GothamBold
+SellText2.TextXAlignment = Enum.TextXAlignment.Left
+SellText2.TextWrapped = true
+SellText2.Parent = SellBox
+
+-- Cho phép bấm vào Zalo để copy số
+local ZaloBtn = Instance.new("TextButton")
+ZaloBtn.Size = UDim2.new(0.25, 0, 0, 22)
+ZaloBtn.Position = UDim2.new(0.75, 0, 0, 26)
+ZaloBtn.BackgroundColor3 = Color3.fromRGB(80, 255, 120)
+ZaloBtn.BackgroundTransparency = 0.85
+ZaloBtn.Text = "📋 COPY"
+ZaloBtn.TextColor3 = Color3.fromRGB(80, 255, 120)
+ZaloBtn.TextSize = 9
+ZaloBtn.Font = Enum.Font.GothamBold
+ZaloBtn.Parent = SellBox
+Instance.new("UICorner", ZaloBtn).CornerRadius = UDim.new(0, 6)
+
+ZaloBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        setclipboard("0942062013")
+    end)
+    local old = ZaloBtn.Text
+    ZaloBtn.Text = "✅ ĐÃ COPY"
+    task.wait(1.5)
+    ZaloBtn.Text = old
+end)
+
 -- Footer
 local Footer = Instance.new("TextLabel")
-Footer.Size = UDim2.new(1, 0, 0, 16)
-Footer.Position = UDim2.new(0, 0, 0, 320)
+Footer.Size = UDim2.new(1, 0, 0, 12)
+Footer.Position = UDim2.new(0, 0, 0, 310)
 Footer.BackgroundTransparency = 1
-Footer.Text = "© 2025 Laam Hub • Made in 🇻🇳"
+Footer.Text = "© Laam Hub 🇻🇳"
 Footer.TextColor3 = Color3.fromRGB(80, 80, 100)
-Footer.TextSize = 11
+Footer.TextSize = 9
 Footer.Font = Enum.Font.Gotham
 Footer.Parent = KeyFrame
 
@@ -280,125 +333,117 @@ Footer.Parent = KeyFrame
 local keyInfo = { expTime = 0, isValid = false }
 
 local function showStatus(text, color)
-    StatusLabel.Text = text
-    StatusLabel.TextColor3 = color
+    Status.Text = text
+    Status.TextColor3 = color
 end
 
-local function formatTime(seconds)
-    if seconds <= 0 then return "Đã hết hạn" end
-    local days = math.floor(seconds / 86400)
-    local hours = math.floor((seconds % 86400) / 3600)
-    local mins = math.floor((seconds % 3600) / 60)
-    if days > 0 then
-        return days .. " ngày " .. hours .. " giờ"
-    elseif hours > 0 then
-        return hours .. " giờ " .. mins .. " phút"
-    else
-        return mins .. " phút"
-    end
+local function formatTime(sec)
+    if sec <= 0 then return "Đã hết hạn" end
+    local d = math.floor(sec / 86400)
+    local h = math.floor((sec % 86400) / 3600)
+    local m = math.floor((sec % 3600) / 60)
+    if d > 0 then return d .. " ngày " .. h .. " giờ"
+    elseif h > 0 then return h .. " giờ " .. m .. " phút"
+    else return m .. " phút" end
 end
 
-local function updateTimeDisplay()
-    if not keyInfo.isValid then
-        TimeBox.Visible = false
-        return
-    end
+local function updateTime()
+    if not keyInfo.isValid then TimeBox.Visible = false return end
     TimeBox.Visible = true
     if keyInfo.expTime == 0 then
-        TimeLabel.Text = "⏰ Còn lại: ♾️ Vĩnh viễn"
+        TimeLabel.Text = "⏰ ♾️ Vĩnh viễn"
         TimeLabel.TextColor3 = Color3.fromRGB(255, 200, 87)
     else
         local remain = keyInfo.expTime - os.time()
         if remain <= 0 then
-            TimeLabel.Text = "❌ Key đã hết hạn!"
+            TimeLabel.Text = "❌ Đã hết hạn"
             TimeLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
         else
-            TimeLabel.Text = "⏰ Còn lại: " .. formatTime(remain)
+            TimeLabel.Text = "⏰ " .. formatTime(remain)
             TimeLabel.TextColor3 = Color3.fromRGB(255, 180, 180)
         end
     end
 end
 
-local function parseTimeFromMessage(msg)
-    if msg:find("Vinh vien") or msg:find("Vinh Viễn") then
+local function parseTime(msg)
+    if msg:find("Vinh vien") then
         keyInfo.expTime = 0
         keyInfo.isValid = true
         return
     end
-    local days = tonumber(msg:match("(%d+) ngay"))
-    local hours = tonumber(msg:match("(%d+) gio")) or 0
-    local mins = tonumber(msg:match("(%d+) phut")) or 0
-    if days then
-        keyInfo.expTime = os.time() + days * 86400 + hours * 3600
-    elseif hours > 0 then
-        keyInfo.expTime = os.time() + hours * 3600 + mins * 60
+    local d = tonumber(msg:match("(%d+) ngay"))
+    local h = tonumber(msg:match("(%d+) gio")) or 0
+    local m = tonumber(msg:match("(%d+) phut")) or 0
+    if d then
+        keyInfo.expTime = os.time() + d * 86400 + h * 3600
+    elseif h > 0 then
+        keyInfo.expTime = os.time() + h * 3600 + m * 60
     else
-        keyInfo.expTime = os.time() + mins * 60
+        keyInfo.expTime = os.time() + m * 60
     end
     keyInfo.isValid = true
 end
 
--- 🌟 HÀM CHẠY MENU CHÍNH
-local function loadMainMenu()
+local function loadMenu()
     showStatus("✅ Đang tải menu...", Color3.fromRGB(80, 255, 120))
-    task.wait(0.5)
-    
+    task.wait(0.3)
     ScreenGui:Destroy()
-    
     pcall(function()
         loadstring(game:HttpGet(MENU_SCRIPT))()
     end)
 end
 
---// 🎯 SỰ KIỆN
+--// 🎯 GET KEY
 GetKeyBtn.MouseButton1Click:Connect(function()
-    pcall(function() setclipboard(GETKEY_LINK) end)
+    local copied = false
     pcall(function()
-        game:GetService("GuiService"):OpenBrowserWindow(GETKEY_LINK)
+        setclipboard(GETKEY_LINK)
+        copied = true
     end)
-    showStatus("🌐 Đã mở link! Vượt link để nhận key.", Color3.fromRGB(80, 200, 255))
-    local old = GetKeyBtn.Text
-    GetKeyBtn.Text = "✅ ĐÃ MỞ LINK!"
-    GetKeyBtn.TextColor3 = Color3.fromRGB(80, 255, 120)
+    
+    if copied then
+        showStatus("✅ Đã copy link! Dán vào trình duyệt.", Color3.fromRGB(80, 255, 120))
+        GetKeyBtn.Text = "✅ ĐÃ COPY LINK!"
+        GetKeyBtn.TextColor3 = Color3.fromRGB(80, 255, 120)
+    else
+        showStatus("⚠️ Không copy được! Link: " .. GETKEY_LINK, Color3.fromRGB(255, 200, 60))
+        GetKeyBtn.Text = "⚠️ KHÔNG COPY ĐƯỢC"
+        GetKeyBtn.TextColor3 = Color3.fromRGB(255, 200, 60)
+    end
+    
     task.wait(2)
-    GetKeyBtn.Text = old
+    GetKeyBtn.Text = "🔗 GET KEY"
     GetKeyBtn.TextColor3 = Color3.fromRGB(255, 120, 120)
 end)
 
+--// 🎯 SUBMIT
 SubmitBtn.MouseButton1Click:Connect(function()
     local k = TextBox.Text
     if k == "" then
-        showStatus("⚠️ Vui lòng nhập key!", Color3.fromRGB(255, 200, 60))
+        showStatus("⚠️ Nhập key!", Color3.fromRGB(255, 200, 60))
         return
     end
     
-    showStatus("⏳ Đang kiểm tra key...", Color3.fromRGB(120, 200, 255))
+    showStatus("⏳ Đang check...", Color3.fromRGB(120, 200, 255))
     
     local r = callAPI("validate", k)
     
     if r.success then
         showStatus("✅ " .. r.message, Color3.fromRGB(80, 255, 120))
-        parseTimeFromMessage(r.message)
-        updateTimeDisplay()
+        parseTime(r.message)
+        updateTime()
         saveKey(k)
-        task.wait(1.5)
-        
-        -- 🌟 CHẠY MENU CHÍNH
-        loadMainMenu()
+        task.wait(1.2)
+        loadMenu()
     else
         showStatus("❌ " .. r.message, Color3.fromRGB(255, 80, 80))
         keyInfo.isValid = false
         TimeBox.Visible = false
-        
         local orig = KeyFrame.Position
         for i = 1, 3 do
-            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
-                Position = orig + UDim2.new(0, 10, 0, 0)
-            }):Play()
+            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {Position = orig + UDim2.new(0, 8, 0, 0)}):Play()
             task.wait(0.05)
-            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {
-                Position = orig - UDim2.new(0, 10, 0, 0)
-            }):Play()
+            TweenService:Create(KeyFrame, TweenInfo.new(0.05), {Position = orig - UDim2.new(0, 8, 0, 0)}):Play()
             task.wait(0.05)
         end
         TweenService:Create(KeyFrame, TweenInfo.new(0.05), {Position = orig}):Play()
@@ -413,22 +458,20 @@ end)
 task.spawn(function()
     local saved = loadSaved()
     if saved then
-        showStatus("🔓 Đang tự động đăng nhập...", Color3.fromRGB(120, 200, 255))
+        showStatus("🔓 Auto login...", Color3.fromRGB(120, 200, 255))
         local r = callAPI("validate", saved)
         if r.success then
-            showStatus("✅ Đã tự động đăng nhập!", Color3.fromRGB(80, 255, 120))
-            parseTimeFromMessage(r.message)
-            updateTimeDisplay()
+            showStatus("✅ Đã đăng nhập!", Color3.fromRGB(80, 255, 120))
+            parseTime(r.message)
+            updateTime()
             task.wait(1)
-            
-            -- 🌟 CHẠY MENU CHÍNH
-            loadMainMenu()
+            loadMenu()
         else
             clearSaved()
-            showStatus("⚠️ Key cũ không hợp lệ!", Color3.fromRGB(255, 200, 60))
+            showStatus("⚠️ Key cũ hết hạn!", Color3.fromRGB(255, 200, 60))
         end
     end
 end)
 
-print("[LAAM HUB] 🇻🇳 Loader đã tải!")
-print("[LAAM HUB] HWID: " .. getHWID())
+print("[LAAM HUB] Loader OK!")
+print("HWID: " .. getHWID())
