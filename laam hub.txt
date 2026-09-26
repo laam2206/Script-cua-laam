@@ -526,6 +526,7 @@ local Tab16o = MakeTab({Name = "Kick a Lucky Block "})
 local Tab17o = MakeTab({Name = "Evomon"})
 local Tab18o = MakeTab({Name = "Racket Rivals"})
 local Tab19o = MakeTab({Name = "Fisch"})
+local Tab20o = MakeTab({Name = "Fling things "})
 
 ------- BUTTON (giữ nguyên tất cả)
 
@@ -1443,6 +1444,244 @@ AddButton(Tab5o, {
         if success then Notify("✅ Đã mở Lemon Hub thành công!") else Notify("❌ Mở Lemon Hub thất bại!") warn(err) end
     end
 })
+
+AddButton(Tab20o, {
+    Name = "Name Hub",
+    Callback = function()
+        Notify("Đang mở Script Name Hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fling-things-and-people-thingy-206157"))()
+        end)
+        if success then Notify("✅ Đã mở Name Hub thành công!") else Notify("❌ Mở Name Hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab5o, {
+    Name = "Blyxo hub",
+    Callback = function()
+        Notify("Đang mở Script Blyxo hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://flowauth.net/v1/loaders/69d3463240384f3a73fbe32c178093a2.lua"))()
+        end)
+        if success then Notify("✅ Đã mở Blyxo hub thành công!") else Notify("❌ Mở Blyxo hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab2o, {
+    Name = "Ruby hub",
+    Callback = function()
+        Notify("Đang mở Script Ruby hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz/refs/heads/main/Ruby/update.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Ruby hub thành công!") else Notify("❌ Mở Ruby hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab5o, {
+    Name = "Neva Hub",
+    Callback = function()
+        Notify("Đang mở Script Neva Hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/VEZ2/NEVAHUB/main/2"))()
+        end)
+        if success then Notify("✅ Đã mở Neva Hub thành công!") else Notify("❌ Mở Neva Hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab2o, {
+    Name = "Emerald hub",
+    Callback = function()
+        Notify("Đang mở Script Emerald hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz/refs/heads/main/Emerald/update.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Emerald hub thành công!") else Notify("❌ Mở Emerald hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab5o, {
+    Name = "Zeroinhub",
+    Callback = function()
+        Notify("Đang mở Script Zeroinhub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://zeroinhub.com/api/script"))()
+        end)
+        if success then Notify("✅ Đã mở Zeroinhub thành công!") else Notify("❌ Mở Zeroinhub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab2o, {
+    Name = "Arc hub",
+    Callback = function()
+        Notify("Đang mở Script Arc Hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Arcylic/refs/heads/main/ARC/script.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Arc hub thành công!") else Notify("❌ Mở Arc hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab8o, {
+    Name = "Oxyge hub",
+    Callback = function()
+        Notify("Đang mở Script Oxyge hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/oxygenscripts/animalhospital/refs/heads/main/oxygenhub"))()
+        end)
+        if success then Notify("✅ Đã mở Oxyge hub thành công!") else Notify("❌ Mở Oxyge hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab8o, {
+    Name = "Oxyge hub",
+    Callback = function()
+        Notify("Đang mở Script Oxyge hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/oxygenscripts/animalhospital/refs/heads/main/oxygenhub"))()
+        end)
+        if success then Notify("✅ Đã mở Oxyge hub thành công!") else Notify("❌ Mở Oxyge hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab13o, {
+    Name = "Vellure",
+    Callback = function()
+        Notify("Đang mở Script vellure...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/NyxaSylph/Vellure/refs/heads/main/Loader"))()
+        end)
+        if success then Notify("✅ Đã mở vellure thành công!") else Notify("❌ Mở vellure thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab13o, {
+    Name = "synerox",
+    Callback = function()
+        Notify("Đang mở Script synerox...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://synex.lat/loaders/clean-leaves.lua"))()
+
+        end)
+        if success then Notify("✅ Đã mở synerox thành công!") else Notify("❌ Mở synerox thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab12o, {
+    Name = "synvextia hub",
+    Callback = function()
+        Notify("Đang mở Script synvextia hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/SynvextiaHub/Loader/refs/heads/main/Syn"))()
+        end)
+        if success then Notify("✅ Đã mở synvextia hub thành công!") else Notify("❌ Mở synvextia hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab2o, {
+    Name = "Ponte hub",
+    Callback = function()
+        Notify("Đang mở Script Ponte hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/Makuscripts/MakuHub/refs/heads/main/PonteHub"))()
+        end)
+        if success then Notify("✅ Đã mở Ponte hub thành công!") else Notify("❌ Mở Ponte hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab5o, {
+    Name = "Vincitore hub",
+    Callback = function()
+        Notify("Đang mở Script Vincitore hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/kadit9999/stealanegg/refs/heads/main/vincore.lua"))()
+        end)
+        if success then Notify("✅ Đã mở Vincitore hub thành công!") else Notify("❌ Mở Vincitore hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab5o, {
+    Name = "Vincitore hub",
+    Callback = function()
+        Notify("Đang mở Script Vincitore hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/kadit9999/stealanegg/refs/heads/main/vincore.lua"))()
+        end)
+        if success then Notify("✅ Đã mở Vincitore hub thành công!") else Notify("❌ Mở Vincitore hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab2o, {
+    Name = "Garnet Hub",
+    Callback = function()
+        Notify("Đang mở Script Garnet Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz/refs/heads/main/Garnet/script.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Garnet Hub thành công!") else Notify("❌ Mở Garnet Hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab5o, {
+    Name = "Cyrus hub",
+    Callback = function()
+        Notify("Đang mở Script Cyrus hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/CyrusOffc/scriptcyrus/refs/heads/main/loader"))()
+        end)
+        if success then Notify("✅ Đã mở Cyrus hub thành công!") else Notify("❌ Mở Cyrus hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab5o, {
+    Name = "Limbo hub",
+    Callback = function()
+        Notify("Đang mở Script Limbo hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://limbohub.my.id/loader.lua"))()
+        end)
+        if success then Notify("✅ Đã mở Limbo hub thành công!") else Notify("❌ Mở Limbo hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab5o, {
+    Name = "Vantablack hub",
+    Callback = function()
+        Notify("Đang mở Script Vantablack hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/tranduykhanh08428-web/VantablackHub/refs/heads/main/Stealanegg.lua.txt"))()
+        end)
+        if success then Notify("✅ Đã mở Vantablack hub thành công!") else Notify("❌ Mở Vantablack hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab5o, {
+    Name = "Speed Hub",
+    Callback = function()
+        Notify("Đang mở Script Speed Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+        end)
+        if success then Notify("✅ Đã mở Speed Hub thành công!") else Notify("❌ Mở Speed Hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab5o, {
+    Name = "SylPhin Hub",
+    Callback = function()
+        Notify("Đang mở Script SylPhin Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/ThienbaoSylphin/SylphinHub2.0/refs/heads/main/SylphinHub2.0"))()
+        end)
+        if success then Notify("✅ Đã mở SylPhin Hub thành công!") else Notify("❌ Mở SylPhin Hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab5o, {
+    Name = "Cloud Hub",
+    Callback = function()
+        Notify("Đang mở Script Cloud Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/ClouthubOnTop/Loader/main/main.lua"))()
+        end)
+        if success then Notify("✅ Đã mở Cloud Hub thành công!") else Notify("❌ Mở Cloud Hub Hub thất bại!") warn(err) end
+    end
+})
+
+
+
+
+
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
