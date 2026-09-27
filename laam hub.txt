@@ -631,16 +631,6 @@ AddButton(Tab1o, {
     end
 })
 
-AddButton(Tab5o, {
-    Name = "Ouroboros Hub",
-    Callback = function()
-        Notify("Đang mở Ouroboros...")
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
-        end)
-        if success then Notify("✅ Đã mở Ouroboros thành công!") else Notify("❌ Mở Ouroboros thất bại!") warn(err) end
-    end
-})
 
 AddButton(Tab9o, {
     Name = "Aimbot Rivals",
@@ -1335,17 +1325,6 @@ AddButton(Tab5o, {
     end
 })
 
-AddButton(Tab2o, {
-    Name = "Redz Hub",
-    Callback = function()
-        Notify("Đang mở Redz Hub...")
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz/refs/heads/main/Redz/script.luau"))()
-        end)
-        if success then Notify("✅ Đã mở Redz Hub thành công!") else Notify("❌ Mở Redz Hub thất bại!") warn(err) end
-    end
-})
-
 AddButton(Tab5o, {
     Name = "Script fake spawm egg + pet",
     Callback = function()
@@ -1357,16 +1336,6 @@ AddButton(Tab5o, {
     end
 })
 
-AddButton(Tab2o, {
-    Name = "Redz Hubv2",
-    Callback = function()
-        Notify("Đang mở Script Redz Hubv2...")
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/d8f1c691a58edb11ef782849f80e9b61.lua"))()
-        end)
-        if success then Notify("✅ Đã mở Redz Hubv2 thành công!") else Notify("❌ Mở Redz Hubv2 thất bại!") warn(err) end
-    end
-})
 
 AddButton(Tab4o, {
     Name = "Ringta script",
@@ -1466,16 +1435,6 @@ AddButton(Tab5o, {
         if success then Notify("✅ Đã mở Blyxo hub thành công!") else Notify("❌ Mở Blyxo hub thất bại!") warn(err) end
     end
 })
-AddButton(Tab2o, {
-    Name = "Ruby hub",
-    Callback = function()
-        Notify("Đang mở Script Ruby hub...")
-        local success, err = pcall(function()
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz/refs/heads/main/Ruby/update.luau"))()
-        end)
-        if success then Notify("✅ Đã mở Ruby hub thành công!") else Notify("❌ Mở Ruby hub thất bại!") warn(err) end
-    end
-})
 
 AddButton(Tab5o, {
     Name = "Neva Hub",
@@ -1488,16 +1447,6 @@ AddButton(Tab5o, {
     end
 })
 
-AddButton(Tab2o, {
-    Name = "Emerald hub",
-    Callback = function()
-        Notify("Đang mở Script Emerald hub...")
-        local success, err = pcall(function()
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz/refs/heads/main/Emerald/update.luau"))()
-        end)
-        if success then Notify("✅ Đã mở Emerald hub thành công!") else Notify("❌ Mở Emerald hub thất bại!") warn(err) end
-    end
-})
 
 AddButton(Tab5o, {
     Name = "Zeroinhub",
@@ -1585,16 +1534,6 @@ AddButton(Tab2o, {
     end
 })
 
-AddButton(Tab5o, {
-    Name = "Vincitore hub",
-    Callback = function()
-        Notify("Đang mở Script Vincitore hub...")
-        local success, err = pcall(function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/kadit9999/stealanegg/refs/heads/main/vincore.lua"))()
-        end)
-        if success then Notify("✅ Đã mở Vincitore hub thành công!") else Notify("❌ Mở Vincitore hub thất bại!") warn(err) end
-    end
-})
 AddButton(Tab5o, {
     Name = "Vincitore hub",
     Callback = function()
