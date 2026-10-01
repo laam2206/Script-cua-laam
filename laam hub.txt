@@ -1616,6 +1616,16 @@ AddButton(Tab5o, {
         if success then Notify("✅ Đã mở Cloud Hub thành công!") else Notify("❌ Mở Cloud Hub Hub thất bại!") warn(err) end
     end
 })
+AddButton(Tab5o, {
+    Name = "Wzeus Hub(tàn hình trộm)",
+    Callback = function()
+        Notify("Đang mở Script Wzeus Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/Wzeus-NTH/Wzeusno1/main/Wzeus/nthzz"))()
+        end)
+        if success then Notify("✅ Đã mở Wzeus Hub thành công!") else Notify("❌ Mở Wzeus Hub Hub thất bại!") warn(err) end
+    end
+})
 
 
 
