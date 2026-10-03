@@ -1626,6 +1626,27 @@ AddButton(Tab5o, {
         if success then Notify("✅ Đã mở Wzeus Hub thành công!") else Notify("❌ Mở Wzeus Hub Hub thất bại!") warn(err) end
     end
 })
+AddButton(Tab5o, {
+    Name = "Wzeus Hub(tàn hình trộm)",
+    Callback = function()
+        Notify("Đang mở Script Wzeus Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/Wzeus-NTH/Wzeusno1/main/Wzeus/nthzz"))()
+        end)
+        if success then Notify("✅ Đã mở Wzeus Hub thành công!") else Notify("❌ Mở Wzeus Hub Hub thất bại!") warn(err) end
+    end
+})
+
+AddButton(Tab2o, {
+    Name = "Banana Hub",
+    Callback = function()
+        Notify("Đang mở Script Banana Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Banana/refs/heads/main/Banana/script.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Banana Hub thành công!") else Notify("❌ Mở Banana Hub Hub thất bại!") warn(err) end
+    end
+})
 
 
 
