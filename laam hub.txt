@@ -979,7 +979,7 @@ AddButton(Tab7o, {
 })
 
 AddButton(Tab2o, {
-    Name = "Kaitun farm max level (real kid hub) ",
+    Name = "Kaitun real kid hub ",
     Callback = function()
         Notify("Đang mở Kaitun farm max level...")
         local success, err = pcall(function()
