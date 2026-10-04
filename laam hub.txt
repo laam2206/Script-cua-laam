@@ -1480,16 +1480,6 @@ AddButton(Tab8o, {
         if success then Notify("✅ Đã mở Oxyge hub thành công!") else Notify("❌ Mở Oxyge hub thất bại!") warn(err) end
     end
 })
-AddButton(Tab8o, {
-    Name = "Oxyge hub",
-    Callback = function()
-        Notify("Đang mở Script Oxyge hub...")
-        local success, err = pcall(function()
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/oxygenscripts/animalhospital/refs/heads/main/oxygenhub"))()
-        end)
-        if success then Notify("✅ Đã mở Oxyge hub thành công!") else Notify("❌ Mở Oxyge hub thất bại!") warn(err) end
-    end
-})
 AddButton(Tab13o, {
     Name = "Vellure",
     Callback = function()
@@ -1682,16 +1672,6 @@ AddButton(Tab3o, {
          loadstring(game:HttpGet("https://raw.githubusercontent.com/ProjectsDaddy/Main/refs/heads/main/FarmPublicTSB"))()
         end)
         if success then Notify("✅ Đã mở Auto Farm Kill Void Suiryu  thành công!") else Notify("❌ Mở Auto Farm Kill Void Suiryu  thất bại!") warn(err) end
-    end
-})
-AddButton(Tab2o, {
-    Name = "Gavz Hub",
-    Callback = function()
-        Notify("Đang mở Script Gavz Hub ...")
-        local success, err = pcall(function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz-Hub/refs/heads/main/Gavz/script.luau"))()
-        end)
-        if success then Notify("✅ Đã mở Gavz Hub thành công!") else Notify("❌ Mở Gavz Hub thất bại!") warn(err) end
     end
 })
 
