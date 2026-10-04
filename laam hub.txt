@@ -1647,9 +1647,126 @@ AddButton(Tab2o, {
         if success then Notify("✅ Đã mở Banana Hub thành công!") else Notify("❌ Mở Banana Hub Hub thất bại!") warn(err) end
     end
 })
+AddButton(Tab3o, {
+    Name = "Goku Moveset Script",
+    Callback = function()
+        Notify("Đang mở Script Goku Moveset Script...")
+        local success, err = pcall(function()
+         _G.Rain = true          -- enable/disable rain (default: true)
+_G.Music = true         -- enable/disable the music system (default: true)
+_G.StartingSong = "9 - Dean Blunt (Slowed)"  -- optional: pick which song plays first (default: random)
+--[[ Available songs:
+    "9 - Dean Blunt (Slowed)"
+    "Waiting for You~"
+    "do i clench my fists?"
+    "lucy~"
+    "im a mistake"
+    "resonance - home (slowed & reverb)"
+    "Clouds"
+    "yves tumor - limerence (instrumental)"
+    "Waiting"
+    "oh god not this shit again (feat. RIVR PERSN)"
+    "EYEDRESS - JEALOUS (OFFICIAL VIDEO)"
+]]
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NetlessScripter/THE-Script/refs/heads/main/Goku%20Finalized"))()
+        end)
+        if success then Notify("✅ Đã mở Goku Moveset Script thành công!") else Notify("❌ Mở Goku Moveset Script Hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab3o, {
+    Name = "Auto Farm Kill Void Suiryu ",
+    Callback = function()
+        Notify("Đang mở Script Auto Farm Kill Void Suiryu ...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/ProjectsDaddy/Main/refs/heads/main/FarmPublicTSB"))()
+        end)
+        if success then Notify("✅ Đã mở Auto Farm Kill Void Suiryu  thành công!") else Notify("❌ Mở Auto Farm Kill Void Suiryu  thất bại!") warn(err) end
+    end
+})
+AddButton(Tab2o, {
+    Name = "Gavz Hub",
+    Callback = function()
+        Notify("Đang mở Script Gavz Hub ...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz-Hub/refs/heads/main/Gavz/script.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Gavz Hub thành công!") else Notify("❌ Mở Gavz Hub thất bại!") warn(err) end
+    end
+})
 
+AddButton(Tab2o, {
+    Name = "Gavz Hub",
+    Callback = function()
+        Notify("Đang mở Script Gavz Hub ...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/bloxfruitsnokey/Redz-Hub/refs/heads/main/Gavz/script.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Gavz Hub thành công!") else Notify("❌ Mở Gavz Hub thất bại!") warn(err) end
+    end
+}) 
+AddButton(Tab4o, {
+    Name = "Orus Hub",
+    Callback = function()
+        Notify("Đang mở Script Orus Hub ...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://gist.github.com/dxyx180-del/d61230c2b0c3bb0f81ff3df14e3ea5a2/raw"))()
+        end)
+        if success then Notify("✅ Đã mở Orus Hub thành công!") else Notify("❌ Mở Orus Hub thất bại!") warn(err) end
+    end
+}) 
+AddButton(Tab5o, {
+    Name = "Big Froot Hub",
+    Callback = function()
+        Notify("Đang mở Script Orus Hub ...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()
+        end)
+        if success then Notify("✅ Đã mở Big Froot thành công!") else Notify("❌ Mở Big Froot thất bại!") warn(err) end
+    end
+}) 
 
+AddButton(Tab6o, {
+    Name = "Eagle Hub Best X Paid Version",
+    Callback = function()
+        Notify("Đang mở Script Eagle Hub Best X Paid Version ...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://pastebin.com/raw/zyPVtPrA"))()
+        end)
+        if success then Notify("✅ Đã mở Eagle Hub Best X Paid Version thành công!") else Notify("❌ Mở Eagle Hub Best X Paid Version thất bại!") warn(err) end
+    end
+}) 
+
+AddButton(Tab6o, {
+    Name = "Eagle Hub Best X Paid Version",
+    Callback = function()
+        Notify("Đang mở Script Eagle Hub Best X Paid Version ...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://pastebin.com/raw/zyPVtPrA"))()
+        end)
+        if success then Notify("✅ Đã mở Eagle Hub Best X Paid Version thành công!") else Notify("❌ Mở Eagle Hub Best X Paid Version thất bại!") warn(err) end
+    end
+}) 
+AddButton(Tab6o, {
+    Name = "Virex Hub",
+    Callback = function()
+        Notify("Đang mở Script Virex Hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://gist.githubusercontent.com/antmaxx12poderoso200/b1b02502acd395da8a12fc53515f9acd/raw/0160f642acb783cfd006c59c47ec5eaa83e3acf7/gistfile1.txt"))()
+        end)
+        if success then Notify("✅ Đã mở Virex Hub thành công!") else Notify("❌ Mở Virex Hub thất bại!") warn(err) end
+    end
+}) 
+AddButton(Tab6o, {
+    Name = "Stellar hub",
+    Callback = function()
+        Notify("Đang mở Script Stellar hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/f7388eab91b827b35ecd1785c9261fb8c6249fa5d53780948ab1ffac8ab9c91b/download"))()
+        end)
+        if success then Notify("✅ Đã mở Stellar hub thành công!") else Notify("❌ Mở Stellar hub thất bại!") warn(err) end
+    end
+}) 
 
 
 
