@@ -10,9 +10,9 @@ local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 
 --// ⚙️ CẤU HÌNH
-local API_URL = "https://script.google.com/macros/s/AKfycbwKwWsp21xs5_xu93AkxQ9Tzy0jDyTgjYP8bhQY2eiv5fA9crZzlwVfDEpQ7vSbDraqMA/exec"
+local API_URL = "https://script.google.com/macros/s/AKfycbzi1Ftnzou9uAVymyhzPGF573NAXP_RDjBILig5FcZ4DsHHm4G5qlG2rNaa-C6cc6DwMA/exec"
 local SECRET = "LAMHUB_SECRET_2025"
-local GETKEY_LINK = "https://link4m.org/eVKbrJ"
+local GETKEY_LINK = "https://link4m.net/guqwmye"
 local MENU_SCRIPT = "https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt"
 
 --// 🛠️ HWID
@@ -91,7 +91,6 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = CoreGui
 
--- 🌟 TĂNG CHIỀU CAO ĐỂ CHỨA THÊM DÒNG BÁN KEY
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0, 320, 0, 330)
 KeyFrame.Position = UDim2.new(0.5, -160, 0.5, -165)
@@ -253,7 +252,7 @@ TimeLabel.Font = Enum.Font.GothamBold
 TimeLabel.TextXAlignment = Enum.TextXAlignment.Left
 TimeLabel.Parent = TimeBox
 
--- 🌟 DÒNG BÁN KEY (MỚI THÊM)
+-- Sell Box
 local SellBox = Instance.new("Frame")
 SellBox.Size = UDim2.new(0.9, 0, 0, 52)
 SellBox.Position = UDim2.new(0.05, 0, 0, 252)
@@ -267,7 +266,6 @@ SellStroke.Color = Color3.fromRGB(255, 180, 60)
 SellStroke.Thickness = 1.2
 SellStroke.Parent = SellBox
 
--- Dòng 1: Bán key
 local SellText1 = Instance.new("TextLabel")
 SellText1.Size = UDim2.new(1, -12, 0, 22)
 SellText1.Position = UDim2.new(0, 6, 0, 4)
@@ -280,7 +278,6 @@ SellText1.TextXAlignment = Enum.TextXAlignment.Left
 SellText1.TextWrapped = true
 SellText1.Parent = SellBox
 
--- Dòng 2: Zalo
 local SellText2 = Instance.new("TextLabel")
 SellText2.Size = UDim2.new(1, -12, 0, 22)
 SellText2.Position = UDim2.new(0, 6, 0, 26)
@@ -293,7 +290,6 @@ SellText2.TextXAlignment = Enum.TextXAlignment.Left
 SellText2.TextWrapped = true
 SellText2.Parent = SellBox
 
--- Cho phép bấm vào Zalo để copy số
 local ZaloBtn = Instance.new("TextButton")
 ZaloBtn.Size = UDim2.new(0.25, 0, 0, 22)
 ZaloBtn.Position = UDim2.new(0.75, 0, 0, 26)
@@ -316,7 +312,6 @@ ZaloBtn.MouseButton1Click:Connect(function()
     ZaloBtn.Text = old
 end)
 
--- Footer
 local Footer = Instance.new("TextLabel")
 Footer.Size = UDim2.new(1, 0, 0, 12)
 Footer.Position = UDim2.new(0, 0, 0, 310)
