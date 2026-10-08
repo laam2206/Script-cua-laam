@@ -1325,16 +1325,6 @@ AddButton(Tab5o, {
     end
 })
 
-AddButton(Tab5o, {
-    Name = "Script fake spawm egg + pet",
-    Callback = function()
-        Notify("Đang mở Script fake spawm egg + pet...")
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/d8f1c691a58edb11ef782849f80e9b61.lua"))()
-        end)
-        if success then Notify("✅ Đã mở thành công!") else Notify("❌ Mở thất bại!") warn(err) end
-    end
-})
 
 
 AddButton(Tab4o, {
@@ -1604,16 +1594,6 @@ AddButton(Tab5o, {
          loadstring(game:HttpGet("https://raw.githubusercontent.com/ClouthubOnTop/Loader/main/main.lua"))()
         end)
         if success then Notify("✅ Đã mở Cloud Hub thành công!") else Notify("❌ Mở Cloud Hub Hub thất bại!") warn(err) end
-    end
-})
-AddButton(Tab5o, {
-    Name = "Wzeus Hub(tàn hình trộm)",
-    Callback = function()
-        Notify("Đang mở Script Wzeus Hub...")
-        local success, err = pcall(function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/Wzeus-NTH/Wzeusno1/main/Wzeus/nthzz"))()
-        end)
-        if success then Notify("✅ Đã mở Wzeus Hub thành công!") else Notify("❌ Mở Wzeus Hub Hub thất bại!") warn(err) end
     end
 })
 AddButton(Tab5o, {
