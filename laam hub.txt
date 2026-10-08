@@ -543,16 +543,6 @@ AddButton(Tab2o, {
     end
 })
 
-AddButton(Tab2o, {
-    Name = "Longhihi BananaHub",
-    Callback = function()
-        Notify("Đang mở Longhihi BananaHub...")
-        local success, err = pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/BananaHub/refs/heads/main/CombackVersion"))()
-        end)
-        if success then Notify("✅ Đã mở Longhihi BananaHub thành công!") else Notify("❌ Mở Longhihi BananaHub thất bại!") end
-    end
-})
 
 AddButton(Tab2o, {
     Name = "Real Kid Hub+ get key",
@@ -1733,8 +1723,9 @@ AddButton(Tab2o, {
         Notify("Đang mở Script Night hub(hop boss)...")
         local success, err = pcall(function()
          getgenv().OldHop = true
-         getgenv().Team = "Marines" -- Marnies
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/HopScript.luau"))()        end)
+getgenv().Team = "Marines" 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/HopScript.luau"))()      
+      end)
         if success then Notify("✅ Đã mở Night hub(hop boss) thành công!") else Notify("❌ Mở Night hub(hop boss) thất bại!") warn(err) end
     end
 }) 
