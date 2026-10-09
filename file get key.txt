@@ -12,7 +12,7 @@ local player = Players.LocalPlayer
 --// ⚙️ CẤU HÌNH
 local API_URL = "https://script.google.com/macros/s/AKfycbzi1Ftnzou9uAVymyhzPGF573NAXP_RDjBILig5FcZ4DsHHm4G5qlG2rNaa-C6cc6DwMA/exec"
 local SECRET = "LAMHUB_SECRET_2025"
-local GETKEY_LINK = "https://link4m.net/guqwmye"
+local GETKEY_LINK = "https://link4m.org/9JzUyM"
 local MENU_SCRIPT = "https://raw.githubusercontent.com/laam2206/Script-cua-laam/refs/heads/main/laam%20hub.txt"
 
 --// 🛠️ HWID
