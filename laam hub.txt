@@ -531,6 +531,26 @@ local Tab20o = MakeTab({Name = "Fling things "})
 ------- BUTTON (giữ nguyên tất cả)
 
 ------- BUTTON
+AddButton(Tab5o, {
+    Name = "Teddy Hub",
+    Callback = function()
+        Notify("Đang mở Night Hub...")
+        local success, err = pcall(function()
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/teddyhubdev/diepvy/refs/heads/main/TeddyHub.lua"))()
+        end)
+        if success then Notify("✅ Đã mở Teddy Hub thành công!") else Notify("❌ Mở Teddy Hub thất bại!") warn(err) end
+    end
+})
+AddButton(Tab5o, {
+    Name = "Night Hub",
+    Callback = function()
+        Notify("Đang mở Night Hub...")
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/StealAnEggs.luau"))()
+        end)
+        if success then Notify("✅ Đã mở Night Hub thành công!") else Notify("❌ Mở Night Hub thất bại!") warn(err) end
+    end
+})
 
 AddButton(Tab2o, {
     Name = "Gravity Hub",
