@@ -532,12 +532,23 @@ local Tab20o = MakeTab({Name = "Fling things "})
 
 ------- BUTTON
 AddButton(Tab2o, {
+    Name = "chilly hubv2",
+    Callback = function()
+        Notify("Đang mở Vantablack hub...")
+        local success, err = pcall(function()
+         loadstring(game:HttpGet("https://gist.githubusercontent.com/ronnei/1fa67c56dd9af203b192d15e752928e5/raw/4e2d5105640e09a008b4ae6df23f9708cadfef06/chilliv2-stealanegg"))()
+        end)
+        if success then Notify("✅ Đã mở chilly hubv2 thành công!") else Notify("❌ Mở chilly hubv2 thất bại!") warn(err) end
+    end
+})
+
+
+AddButton(Tab2o, {
     Name = "Vantablack hub",
     Callback = function()
         Notify("Đang mở Vantablack hub...")
         local success, err = pcall(function()
          loadstring(game:HttpGet("https://raw.githubusercontent.com/tranduykhanh08428-web/VantablackHub/refs/heads/main/VantablackHub.lua.txt"))()
-
         end)
         if success then Notify("✅ Đã mở Vantablack hub thành công!") else Notify("❌ Mở Vantablack hub thất bại!") warn(err) end
     end
@@ -1325,13 +1336,13 @@ AddButton(Tab5o, {
 })
 
 AddButton(Tab5o, {
-    Name = "Chilly Hub tự động nhặt trứng 3 ",
+    Name = "Chilly Hubv1 tự động nhặt trứng 3 ",
     Callback = function()
         Notify("Đang mở Chilly Hub tự động nhặt trứng...")
         local success, err = pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/kadit9999/stealanegg/refs/heads/main/chilly.lua"))()
         end)
-        if success then Notify("✅ Đã mở Chilly Hub thành công!") else Notify("❌ Mở Chilly Hub thất bại!") warn(err) end
+        if success then Notify("✅ Đã mở Chilly Hubv1 thành công!") else Notify("❌ Mở Chilly Hubv1 thất bại!") warn(err) end
     end
 })
 
