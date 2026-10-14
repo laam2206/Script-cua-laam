@@ -531,7 +531,7 @@ local Tab20o = MakeTab({Name = "Fling things "})
 ------- BUTTON (giữ nguyên tất cả)
 
 ------- BUTTON
-AddButton(Tab2o, {
+AddButton(Tab5o, {
     Name = "chilly hubv2",
     Callback = function()
         Notify("Đang mở Vantablack hub...")
